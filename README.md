@@ -107,7 +107,7 @@ window.SITE = {
   phoneDisplay: '+233 59 613 4611',   // shown to customers
   phoneRaw: '+233596134611',          // used for click-to-call
   whatsapp: '233553965448',           // country code, no + or spaces
-  email: '',                          // add it here when you have one
+  email: 'nbsolutions571@gmail.com',                          // add it here when you have one
   ...
 };
 ```

@@ -26,7 +26,7 @@ window.SITE = {
 
   // ADD YOUR EMAIL HERE when you have it. While this is empty, the email
   // row is hidden automatically everywhere on the site.
-  email: '',
+  email: 'nbsolutions571@gmail.com',
 
   // Located in Apollo, Takoradi — per the flyer
   address: 'Apollo, Takoradi, Western Region, Ghana',
