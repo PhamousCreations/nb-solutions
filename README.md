@@ -3,10 +3,14 @@
 Website for **N&B Solutions**, a registered Ghanaian company providing industrial,
 commercial and residential **cleaning and laundry services**.
 
-It's a complete, working site: marketing pages, a quote/booking form that saves real
-requests, and a staff dashboard to manage them. Built with **zero dependencies** —
-plain HTML, CSS and JavaScript on a small Node server. No `npm install`, nothing to
-keep updated.
+This is a **company profile / portfolio site** rather than a shop. It presents who
+N&B Solutions is, what the company does and who it serves, and gives visitors a direct
+way to get in touch. There are no published prices — services are discussed and scoped
+per client, starting with a free site assessment.
+
+It's still a complete, working site: an enquiry form that saves real messages, and a
+staff dashboard to manage them. Built with **zero dependencies** — plain HTML, CSS and
+JavaScript on a small Node server. No `npm install`, nothing to keep updated.
 
 ---
 
@@ -31,9 +35,9 @@ these in their dashboard instead.
 
 | Page | What it does |
 |---|---|
-| `/` | Home — services, how it works, about, pricing, our promise, FAQ, contact |
-| `/book` (`book.html`) | Request a quote or book a laundry pickup |
-| `/admin` (`admin.html`) | Staff dashboard — manage incoming requests |
+| `/` | Home — company profile, services, who we serve, how we work, FAQ, contact |
+| `/contact` (`contact.html`) | Contact form — the main call to action on every page |
+| `/admin` (`admin.html`) | Staff dashboard — manage incoming enquiries |
 | `/api/health` | Quick check that the server is alive |
 
 ---
@@ -62,9 +66,10 @@ these in their dashboard instead.
 - [ ] **Real service areas** — the site lists Accra neighbourhoods as a starting set.
       Trim `areas` in `config.js` to what you actually cover, then update the chips on
       the home page contact section.
-- [ ] **Real laundry prices** — the rate card uses indicative figures I made up as
-      placeholders (GH₵ 12/kg, GH₵ 10 per shirt, etc). Replace them with your rates.
 - [ ] **Registration number** — nice for trust once you have it to hand.
+- [ ] **Photographs** — real photos of the team and finished jobs would lift this a lot.
+      Ask me and I'll add a gallery section with the images you supply ("before you
+      send photos, read the note in *Photographs* below).
 
 ---
 
@@ -74,8 +79,13 @@ Two files cover almost everything:
 
 | File | What lives there |
 |---|---|
-| `public/config.js` | Contact details, services, service areas, time slots, laundry prices |
+| `public/config.js` | Contact details, services offered, who you serve, service areas, time slots |
 | `public/index.html` | The marketing copy — company description, vision, mission, objectives, FAQ |
+
+**Services and client sectors are driven from `config.js`.** Add, remove or rename an
+entry in `services` and the enquiry form updates itself. Add a sector to `sectors` and
+a new card appears in the "Who we serve" section. Available icons: `office`, `hotel`,
+`factory`, `school`, `home`, `event`.
 
 ### config.js
 
@@ -96,19 +106,22 @@ window.SITE = {
 `cleaningValues` is treated as "quoted per site" — the form hides the laundry
 item list for those and asks for an assessment instead.
 
-**Prices feed two places at once**: the rate card on the home page *and* the live
-estimate in the booking form. Change a price in `laundryPrices` and both follow.
+There is deliberately **no pricing anywhere on the site**. Pricing was removed so that
+every enquiry becomes a conversation. If you'd rather show indicative rates for laundry
+later, say the word and I'll add a rate card back.
 
 ---
 
-## How requests work
+## How enquiries work
 
-1. A visitor fills in `/book` (quote request or laundry pickup).
+1. A visitor fills in `/contact` — service needed, where they are, how to reach them,
+   and a description of the job. Date and time are optional, so they can simply ask
+   you to call.
 2. It POSTs to `/api/bookings`, which validates it and saves it to `data/bookings.json`
    with a reference like `NB-261005-AK41`.
 3. They see a confirmation with their reference and a one-tap "Send it on WhatsApp too"
    button.
-4. You open `/admin` and move the request through:
+4. You open `/admin` and move the enquiry through:
    **new → confirmed → picked up → delivered** (or cancelled). You can WhatsApp the
    customer straight from the dashboard.
 
@@ -129,8 +142,8 @@ Default key: `nb-solutions-admin` — **change this before going live**:
 ADMIN_KEY=a-long-random-password node server.js
 ```
 
-`data/bookings.json` ships with four sample requests so the dashboard isn't empty when
-you first look. Delete them when you're ready for real data (keep the
+`data/bookings.json` ships with five sample enquiries (a hotel, an industrial site, a
+home deep clean and two laundry jobs) so the dashboard isn't empty when you first look. Delete them when you're ready for real data (keep the
 `{"bookings": []}` structure).
 
 That file is in `.gitignore` on purpose: it holds customer names, phone numbers and
@@ -143,10 +156,9 @@ dashboard, which is exactly what you want.
 
 - [ ] Set a real admin key: `ADMIN_KEY=... node server.js`
 - [ ] Add your email to `config.js`
-- [ ] Replace the placeholder laundry prices with your real rates
 - [ ] Trim the service areas to what you actually cover
 - [ ] Confirm your opening hours and address
-- [ ] Replace the four sample requests in `data/bookings.json`
+- [ ] Replace the five sample enquiries in `data/bookings.json`
 - [ ] Update the trust bar on `index.html` once you have real figures to show
 - [ ] Ask your first few clients for a short quote, then we can swap the
       "Our promise" section for real testimonials
@@ -168,8 +180,8 @@ custom domain, backups.
 | **Your own VPS** | `pm2 start server.js` behind nginx. Full control, you handle HTTPS. |
 | **Vercel / Netlify** | Static pages yes; the request API needs a database instead of a file. |
 
-⚠️ **Requests and free hosting:** on a free instance the disk is wiped on every restart,
-so `data/bookings.json` gets cleared — you'd lose requests. For a real business use a
+⚠️ **Enquiries and free hosting:** on a free instance the disk is wiped on every restart,
+so `data/bookings.json` gets cleared — you'd lose enquiries. For a real business use a
 persistent disk and set `DATA_DIR` to its mount path (see `render.yaml`). Clients can
 always reach you by phone or WhatsApp in the meantime, but don't rely on the dashboard
 alone until this is set up.
@@ -177,9 +189,9 @@ alone until this is set up.
 **Domain in Ghana:** register a `.com` (cheap, works fine) or a `.com.gh`, then point
 the DNS record at your host. Render issues free HTTPS automatically.
 
-**Payments:** the site records requests and lets you collect by MoMo, cash, transfer or
-invoice. To take payment online (deposits for contract jobs, for example) you'd add a
-Paystack or Flutterwave account — both support Ghana. Say the word and I'll wire it up.
+**Payments:** since there are no prices on the site, payment is settled directly with
+each client by MoMo, cash, transfer or monthly invoice. If you later want deposits or
+online payment for contract work, Paystack and Flutterwave both support Ghana.
 
 ---
 
@@ -195,13 +207,13 @@ laundry-site/
 ├── .env.example           # copy to .env for local secrets
 ├── DEPLOY.md              # ← full hosting walkthrough
 ├── data/
-│   └── bookings.json      # incoming requests (sample data included, gitignored)
+│   └── bookings.json      # incoming enquiries (sample data included, gitignored)
 ├── public/
 │   ├── config.js          # ← YOUR DETAILS, SERVICES AND PRICES
 │   ├── app.js             # front-end logic: pricing, form, dashboard
 │   ├── styles.css         # all styling
 │   ├── index.html         # home page  ← marketing copy lives here
-│   ├── book.html          # quote / booking page
+│   ├── contact.html       # contact / enquiry page
 │   ├── admin.html         # staff dashboard
 │   └── 404.html
 └── README.md
@@ -211,9 +223,9 @@ laundry-site/
 
 ## Nice next steps
 
-- Email or SMS notification to you when a request comes in (so you don't have to
-  keep the dashboard open)
-- Customer tracking page: enter your reference, see the job's status
-- Online deposits via Paystack or Flutterwave
-- Real photography: before/after shots of cleaning jobs make this sell much harder
+- **Email or SMS notification** when an enquiry arrives, so you don't have to keep
+  the dashboard open
+- **A photo gallery** with real images of completed jobs — the single biggest upgrade
+  to a portfolio site like this
+- **A downloadable company profile (PDF)** to send hotels and offices with a proposal
 - Google Business Profile with photos, linking to this site

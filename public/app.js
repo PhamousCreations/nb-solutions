@@ -5,10 +5,9 @@
   const S = window.SITE || {};
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-  const money = (n) => S.currency + ' ' + Number(n).toLocaleString('en-GH');
 
   /* Escape anything that came from a visitor before putting it in the page.
-     Bookings are free text, so this stops someone typing HTML into the form
+     Enquiries are free text, so this stops someone typing HTML into the form
      and having it run in your staff dashboard. */
   const esc = (v) =>
     String(v == null ? '' : v).replace(/[&<>"']/g, (c) =>
@@ -19,6 +18,16 @@
     const text = (extra ? extra + '\n\n' : '') + (S.whatsappMessage || '');
     return 'https://wa.me/' + S.whatsapp + '?text=' + encodeURIComponent(text);
   }
+
+  /* Icons for the "who we serve" section, keyed to config.js */
+  const SECTOR_ICONS = {
+    office:  '<rect x="4" y="3.5" width="10" height="17" rx="1.8"/><path d="M14 9h5.5v11.5"/><path d="M7 7.5h4M7 11h4M7 14.5h4"/><path d="M3 20.5h18"/>',
+    hotel:   '<path d="M3 20.5V9.2L12 3.5l9 5.7v11.3z"/><path d="M9.5 20.5v-6h5v6"/><path d="M17.5 6.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+    factory: '<path d="M3 20.5V9.8l5 3V9.8l5 3V9.8l5 3V20.5z"/><path d="M18 20.5V5.5h3v15"/><path d="M20 9h.5M20 12.5h.5"/><path d="M2 20.5h20"/>',
+    school:  '<path d="M12 3.5 21 8l-9 4.5L3 8z"/><path d="M6 10.2v5.3c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.3"/><path d="M21 8v6"/>',
+    home:    '<path d="M3.5 11 12 4.5 20.5 11"/><path d="M5.5 12.5v8h13v-8"/><path d="M10 20.5v-5h4v5"/>',
+    event:   '<path d="M8 3.5h8l-1.1 6.2a3 3 0 0 1-5.8 0z"/><path d="M12 12.7v6M9 20.5h6"/><path d="M5 5.5l3.4 1.2M19 5.5l-3.4 1.2"/>',
+  };
 
   /* ----------------------------- config injection ---------------------------- */
   function hydrate() {
@@ -54,7 +63,7 @@
        Add one in config.js and they reappear everywhere automatically. */
     if (!S.email) {
       $$('[data-site="email"], [data-site-href="email"]').forEach((el) => {
-        const row = el.closest('li') || el.closest('.contact-row');
+        const row = el.closest('li');
         (row || el).hidden = true;
       });
     }
@@ -96,23 +105,28 @@
     }
   }
 
-  /* ------------------------------ pricing table ------------------------------ */
-  function renderPricing() {
-    const tbody = $('#priceRows');
-    if (tbody && Array.isArray(S.laundryPrices)) {
-      tbody.innerHTML = S.laundryPrices
-        .map(
-          (p) => `<tr>
-            <td><strong>${esc(p.name)}</strong>${p.note ? `<span class="price-note">${esc(p.note)}</span>` : ''}</td>
-            <td class="price-cell">${money(p.price)}</td>
-          </tr>`
-        )
-        .join('');
-    }
+  /* ----------------------------- who we serve ------------------------------ */
+  function renderSectors() {
+    const box = $('#sectorGrid');
+    if (!box || !Array.isArray(S.sectors)) return;
+    box.innerHTML = S.sectors
+      .map((sec) => {
+        const path = SECTOR_ICONS[sec.icon] || SECTOR_ICONS.office;
+        return `<article class="card reveal">
+          <div class="icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>
+          </div>
+          <h3>${esc(sec.title)}</h3>
+          <p>${esc(sec.text)}</p>
+        </article>`;
+      })
+      .join('');
+    /* these were injected after the observer ran, so reveal them now */
+    $$('.reveal', box).forEach((el) => el.classList.add('in'));
   }
 
-  /* --------------------------------- booking --------------------------------- */
-  function initBooking() {
+  /* ------------------------------ enquiry form ------------------------------ */
+  function initEnquiry() {
     const form = $('#bookingForm');
     if (!form) return;
 
@@ -134,7 +148,7 @@
     if (areaSel) areaSel.innerHTML = '<option value="">Select your area…</option>' + (S.areas || []).map((a) => `<option>${esc(a)}</option>`).join('');
 
     const slotSel = $('#slot');
-    if (slotSel) slotSel.innerHTML = '<option value="">Select a window…</option>' + (S.timeSlots || []).map((t) => `<option>${esc(t)}</option>`).join('');
+    if (slotSel) slotSel.innerHTML = '<option value="">Any time / not sure yet</option>' + (S.timeSlots || []).map((t) => `<option>${esc(t)}</option>`).join('');
 
     const dateInput = $('#pickupDate');
     if (dateInput) {
@@ -143,10 +157,6 @@
       dateInput.min = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
     }
 
-    const itemsBox = $('#itemRows');
-    const prices = S.laundryPrices || [];
-    const cleaningSet = S.cleaningValues || [];
-
     // Service can be radio inputs (name="servicePick") or a <select id="service">
     function getService() {
       const sel = $('#service');
@@ -154,77 +164,6 @@
       const picked = document.querySelector('input[name="servicePick"]:checked');
       return picked ? picked.value : 'laundry';
     }
-
-    function addRow(preset) {
-      const row = document.createElement('div');
-      row.className = 'item-row';
-      row.innerHTML = `
-        <select class="item-name" aria-label="Item type">
-          ${prices.map((p) => `<option value="${esc(p.name)}" data-price="${p.price}">${esc(p.name)}</option>`).join('')}
-        </select>
-        <input class="item-qty" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Quantity" />
-        <button type="button" class="icon-btn remove-row" aria-label="Remove item">&times;</button>`;
-      itemsBox.appendChild(row);
-      if (preset) {
-        $('.item-name', row).value = preset.name;
-        $('.item-qty', row).value = preset.qty;
-      }
-      row.addEventListener('input', updateEstimate);
-      row.addEventListener('change', updateEstimate);
-      $('.remove-row', row).addEventListener('click', () => {
-        if ($$('.item-row', itemsBox).length > 1) row.remove();
-        else {
-          $('.item-qty', row).value = 1;
-          $('.item-name', row).selectedIndex = 0;
-        }
-        updateEstimate();
-      });
-      updateEstimate();
-    }
-
-    function currentItems() {
-      return $$('.item-row', itemsBox)
-        .map((row) => ({
-          name: $('.item-name', row).value,
-          qty: Math.max(1, parseInt($('.item-qty', row).value, 10) || 1),
-        }))
-        .filter((i) => i.qty > 0);
-    }
-
-    function updateEstimate() {
-      const out = $('#estimate');
-      const service = getService();
-      const isCleaning = cleaningSet.includes(service);
-
-      /* Cleaning is quoted per site, so the item list isn't relevant — hide it
-         rather than asking people to fill in a form that doesn't apply. */
-      const fs = $('#itemsFieldset');
-      if (fs) fs.hidden = isCleaning;
-
-      if (!out) return;
-      if (isCleaning) {
-        out.innerHTML = 'Cleaning is quoted per site, so there\'s no fixed price list. <strong>Submit this and we\'ll arrange a free assessment</strong>, then send you a written quote.';
-        return;
-      }
-      if (service === 'mixed') {
-        out.innerHTML = 'Mixed jobs are priced after we see the details — <strong>laundry by weight or item, cleaning after a free assessment.</strong>';
-        return;
-      }
-      const total = currentItems().reduce((sum, it) => {
-        const p = prices.find((x) => x.name === it.name);
-        return sum + (p ? p.price * it.qty : 0);
-      }, 0);
-      out.innerHTML = total
-        ? `Estimated total: <strong>${money(total)}</strong> <span class="muted">— confirmed when we weigh and count your items.</span>`
-        : 'Add items above and we’ll show a running estimate.';
-    }
-
-    if (prices.length) addRow({ name: prices[0].name, qty: 5 });
-    $('#addItem').addEventListener('click', () => addRow());
-    const serviceSel = $('#service');
-    if (serviceSel) serviceSel.addEventListener('change', updateEstimate);
-    $$('input[name="servicePick"]').forEach((r) => r.addEventListener('change', updateEstimate));
-    updateEstimate();
 
     function showErrors(list) {
       const box = $('#formErrors');
@@ -247,9 +186,8 @@
         pickupDate: $('#pickupDate').value,
         slot: $('#slot').value,
         frequency: $('#frequency') ? $('#frequency').value : '',
-        payment: $('#payment') ? $('#payment').value : 'cash',
         notes: $('#notes').value,
-        items: cleaningSet.includes(getService()) ? [] : currentItems(),
+        items: [],
       };
       btn.disabled = true;
       const label = btn.textContent;
@@ -267,7 +205,7 @@
         done.hidden = false;
         $('#refOut').textContent = data.ref;
         $('#waConfirm').href = waLink(
-          `Hello ${S.name}, I've just sent a request through your website. My reference is ${data.ref} (${payload.service} on ${payload.pickupDate}, ${payload.slot}).`
+          `Hello ${S.name}, I've just sent an enquiry through your website. My reference is ${data.ref} (${payload.service}).`
         );
         done.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err) {
@@ -304,9 +242,9 @@
         (s) => `<div class="stat"><span class="stat-num">${state.bookings.filter((b) => b.status === s).length}</span><span class="stat-label">${s.replace('-', ' ')}</span></div>`
       );
       $('#adminStats').innerHTML = stats.join('');
-      $('#adminCount').textContent = `${list.length} request${list.length === 1 ? '' : 's'}`;
+      $('#adminCount').textContent = `${list.length} enquir${list.length === 1 ? 'y' : 'ies'}`;
       if (!list.length) {
-        $('#adminList').innerHTML = `<p class="empty">No requests here yet. New ones sent from the website will appear automatically.</p>`;
+        $('#adminList').innerHTML = `<p class="empty">No enquiries here yet. New ones sent from the website will appear automatically.</p>`;
         return;
       }
       $('#adminList').innerHTML = list
@@ -317,11 +255,10 @@
               <time>${new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time>
             </header>
             <p class="bk-main">${esc(b.name)} · <a href="tel:${esc(String(b.phone).replace(/\s/g, ''))}">${esc(b.phone)}</a></p>
-            <p class="bk-sub">${esc(String(b.service).replace(/-/g, ' '))} · ${esc(b.area)} · ${esc(b.pickupDate)} (${esc(b.slot)}) · pay by ${esc(b.payment)}${b.frequency ? ' · ' + esc(b.frequency) : ''}</p>
+            <p class="bk-sub">${esc(String(b.service).replace(/-/g, ' '))} · ${esc(b.area)}${b.pickupDate ? ' · ' + esc(b.pickupDate) : ''}${b.slot ? ' (' + esc(b.slot) + ')' : ''}${b.frequency ? ' · ' + esc(b.frequency) : ''}</p>
             <p class="bk-sub">${esc(b.address)}</p>
-            ${b.items && b.items.length ? `<ul class="bk-items">${b.items.map((i) => `<li>${esc(i.qty)} × ${esc(i.name)}</li>`).join('')}</ul>` : ''}
-            ${b.notes ? `<p class="bk-note">“${esc(b.notes)}”</p>` : ''}
             ${b.email ? `<p class="bk-sub">✉ <a href="mailto:${esc(b.email)}">${esc(b.email)}</a></p>` : ''}
+            ${b.notes ? `<p class="bk-note">“${esc(b.notes)}”</p>` : ''}
             <footer>
               ${['new', 'confirmed', 'picked-up', 'delivered', 'cancelled']
                 .filter((s) => s !== b.status)
@@ -366,7 +303,7 @@
       if (btn.dataset.wa) {
         window.open(
           'https://wa.me/' + btn.dataset.wa + '?text=' +
-            encodeURIComponent('Hello, this is ' + (S.name || '') + ' about your request ' + btn.dataset.ref + '.'),
+            encodeURIComponent('Hello, this is ' + (S.name || '') + ' about your enquiry ' + btn.dataset.ref + '.'),
           '_blank'
         );
         return;
@@ -387,8 +324,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     hydrate();
     chrome();
-    renderPricing();
-    initBooking();
+    renderSectors();
+    initEnquiry();
     initAdmin();
   });
 })();

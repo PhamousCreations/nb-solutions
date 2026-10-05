@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------
- * N&B SOLUTIONS — ONE PLACE TO EDIT YOUR CONTACT DETAILS, SERVICES AND PRICES.
+ * N&B SOLUTIONS — ONE PLACE TO EDIT YOUR CONTACT DETAILS AND SERVICES.
  *
  * Change the values below and every page updates itself.
  * Anything marked PLACEHOLDER is placeholder data you should confirm or replace.
@@ -31,11 +31,9 @@ window.SITE = {
   hours: 'Monday to Saturday',
   hoursSunday: 'Evening &amp; weekend work available for commercial clients',
 
-  /* ------------------------------- prices ------------------------------- */
-  currency: 'GH₵',
-
-  /* PLACEHOLDER LIST — trim this to the areas you actually cover.
-     It fills the booking form's area dropdown. */
+  /* ------------------------- coverage & scheduling ----------------------- */
+  /* PLACEHOLDER — trim this to the areas you actually cover.
+     It fills the contact form's area dropdown. */
   areas: [
     'Accra Central', 'East Legon', 'Airport Residential', 'Labone', 'Cantonments',
     'Osu', 'Spintex', 'Dansoman', 'Madina', 'Achimota', 'Tema', 'Other / ask us',
@@ -43,7 +41,7 @@ window.SITE = {
   timeSlots: ['08:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00'],
 
   /* ------------------------------ services ------------------------------ */
-  /* These fill the booking form. Add, remove or rename freely —
+  /* These fill the enquiry form. Add, remove or rename freely —
      the value must stay lowercase-with-dashes. */
   services: [
     { value: 'laundry',              label: 'Laundry services',              hint: 'Washing, drying, ironing, folding & stain treatment' },
@@ -53,31 +51,18 @@ window.SITE = {
     { value: 'hotel-cleaning',       label: 'Hotel & guesthouse cleaning',   hint: 'Rooms, linen, turnarounds' },
     { value: 'move-cleaning',        label: 'Move-in / move-out cleaning',   hint: 'Empty-property deep clean' },
     { value: 'post-event-cleaning',  label: 'Post-event cleaning',           hint: 'After parties, weddings, functions' },
-    { value: 'mixed',                label: 'More than one of these',        hint: "We'll sort it out with you" },
+    { value: 'mixed',                label: 'More than one of these',        hint: "We'll discuss what you need" },
   ],
 
-  /* Which of the above are quoted per site rather than priced per item.
-     The booking form hides the laundry item list for these. */
-  cleaningValues: [
-    'deep-cleaning', 'industrial-cleaning', 'commercial-cleaning',
-    'hotel-cleaning', 'move-cleaning', 'post-event-cleaning',
-  ],
-
-  /* ---------------------------- laundry prices ---------------------------- */
-  /* PLACEHOLDER PRICES — these are indicative figures, not your confirmed
-     rates. Change them to your real prices and both the pricing table and the
-     booking form's estimate update together. */
-  laundryPrices: [
-    { name: 'Washing & folding (per kg)',  price: 12, note: 'Minimum 5kg' },
-    { name: 'Ironing only (per item)',     price: 6,  note: 'Already washed at home' },
-    { name: 'Shirt (wash & iron)',         price: 10, note: 'Hanger pressed' },
-    { name: 'T-shirt / Top',               price: 7,  note: '' },
-    { name: 'Trousers / Jeans',            price: 9,  note: '' },
-    { name: 'Dress (wash & iron)',         price: 14, note: '' },
-    { name: 'Suit (2-piece, dry clean)',   price: 45, note: 'Dry clean only' },
-    { name: 'Bedsheet set',                price: 28, note: 'Sheet + 2 cases' },
-    { name: 'Duvet (large)',               price: 55, note: '' },
-    { name: 'Towel',                       price: 8,  note: '' },
-    { name: 'Curtains (per panel)',        price: 30, note: '' },
+  /* ----------------------------- who we serve ---------------------------- */
+  /* The client groups the business targets. Shown as a section on the home
+     page and in the enquiry form's "type of client" options. */
+  sectors: [
+    { icon: 'office',   title: 'Offices & corporate',   text: 'Regular cleaning for offices, banks, shops and shared workspaces — scheduled around your working hours.' },
+    { icon: 'hotel',    title: 'Hotels & guesthouses',  text: 'Guest rooms, bathrooms, lobbies and corridors, plus fast turnarounds between check-out and check-in.' },
+    { icon: 'factory',  title: 'Industrial & commercial', text: 'Factories, warehouses, workshops and large premises, including floors and high-traffic areas.' },
+    { icon: 'school',   title: 'Schools & institutions', text: 'Classrooms, clinics, churches and community buildings cleaned on a dependable schedule.' },
+    { icon: 'home',     title: 'Homes & residents',     text: 'Deep cleaning, move-in and move-out cleans, and household laundry collected and returned.' },
+    { icon: 'event',    title: 'Events & functions',    text: 'Post-event cleaning after parties, weddings, conferences and funerals — we leave the venue ready.' },
   ],
 };

@@ -142,18 +142,21 @@ function validateBooking(input) {
   if (!SERVICE_RE.test(b.service)) errors.push('Please choose a service.');
   if (b.area.length < 2) errors.push('Please choose your area.');
   if (b.address.length < 5) errors.push('Please give us a pickup address (at least 5 characters).');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(b.pickupDate)) {
-    errors.push('Please choose a pickup date (YYYY-MM-DD).');
-  } else {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const picked = new Date(b.pickupDate + 'T00:00:00');
-    const max = new Date(today.getTime() + 60 * 864e5);
-    if (isNaN(picked.getTime())) errors.push('That pickup date is not valid.');
-    else if (picked < today) errors.push('Pickup date cannot be in the past.');
-    else if (picked > max) errors.push('Please pick a date within the next 60 days.');
+  /* Date and time window are OPTIONAL: this site is an enquiry form, so a
+     visitor may just want us to call them. Validate only when provided. */
+  if (b.pickupDate) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(b.pickupDate)) {
+      errors.push('That preferred date looks invalid.');
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const picked = new Date(b.pickupDate + 'T00:00:00');
+      const max = new Date(today.getTime() + 120 * 864e5);
+      if (isNaN(picked.getTime())) errors.push('That preferred date is not valid.');
+      else if (picked < today) errors.push('The preferred date cannot be in the past.');
+      else if (picked > max) errors.push('Please pick a date within the next 4 months.');
+    }
   }
-  if (!b.slot) errors.push('Please choose a pickup time window.');
 
   const rawItems = Array.isArray(input.items) ? input.items.slice(0, 60) : [];
   b.items = rawItems
@@ -199,7 +202,10 @@ async function handleApi(req, res, url) {
     const list = readBookings();
     list.unshift(record);
     writeBookings(list);
-    console.log(`[booking] ${record.ref} — ${record.name} — ${record.service} — ${record.pickupDate} ${record.slot}`);
+    console.log(
+      `[enquiry] ${record.ref} — ${record.name} — ${record.service}` +
+        (record.pickupDate ? ` — prefers ${record.pickupDate} ${record.slot || ''}` : ' — no date given')
+    );
     return send(res, 201, { ok: true, ref: record.ref, booking: record });
   }
 

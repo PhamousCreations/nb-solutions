@@ -120,8 +120,8 @@ Render redeploys automatically within a minute. That's the workflow from now on:
 
 - [ ] `ADMIN_KEY` changed to something strong (Render's generated one is good)
 - [ ] Real details in `public/config.js`
-- [ ] Sample bookings cleared (open `/admin`, or delete `data/bookings.json` on the server)
-- [ ] Test a real booking: submit the form, confirm it appears in `/admin`
+- [ ] Sample enquiries cleared (open `/admin`, or delete `data/bookings.json` on the server)
+- [ ] Test a real enquiry: submit the form, confirm it appears in `/admin`
 - [ ] Check the WhatsApp button opens *your* chat with the message pre-filled
 - [ ] Visit the site on your phone — most of your customers will be on mobile
 - [ ] Remove the "Staff login" link from the footer in `index.html` if you don't want it public
@@ -143,7 +143,7 @@ To roll back, Render keeps your deploy history — pick an earlier one and hit *
 
 ---
 
-## Backing up bookings
+## Backing up enquiries
 
 `data/bookings.json` is the only file with irreplaceable data in it. Download it from the
 dashboard occasionally (Render → Shell → `cat /var/data/bookings.json`), or ask me to add

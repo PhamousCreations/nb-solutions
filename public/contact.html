@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Request a quote or booking — %SITE%</title>
-<meta name="description" content="Request a free assessment or arrange a laundry pickup with N&amp;B Solutions. Cleaning and laundry services for businesses, hotels and homes in Ghana." />
+<title>Contact us — %SITE%</title>
+<meta name="description" content="Contact N&amp;B Solutions for cleaning and laundry services in Ghana. Tell us what you need and we'll arrange a free site assessment." />
 <meta name="theme-color" content="#17a398" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2317a398'/%3E%3Cpath d='M16 6l1.9 5.2L23 13l-5.1 1.8L16 20l-1.9-5.2L9 13l5.1-1.8z' fill='white'/%3E%3Cpath d='M23 19c1.4 1.7 2.1 2.9 2.1 4a2.1 2.1 0 1 1-4.2 0c0-1.1.7-2.3 2.1-4z' fill='%23ffc24b'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="styles.css" />
@@ -27,15 +27,15 @@
     </a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="site-nav" aria-label="Main">
+      <a href="index.html#about">Profile</a>
       <a href="index.html#services">Services</a>
-      <a href="index.html#how">How it works</a>
-      <a href="index.html#about">About us</a>
-      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#sectors">Who we serve</a>
+      <a href="index.html#how">How we work</a>
       <a href="index.html#faq">FAQ</a>
       <a href="index.html#contact">Contact</a>
       <div class="nav-actions">
         <a class="btn btn-ghost btn-sm" data-site-href="phone" href="#">Call us</a>
-        <a class="btn btn-primary btn-sm" href="book.html">Request a quote</a>
+        <a class="btn btn-primary btn-sm" href="contact.html">Contact us</a>
       </div>
     </nav>
   </div>
@@ -43,9 +43,9 @@
 
 <div class="page-head">
   <div class="wrap">
-    <p class="crumbs"><a href="index.html">Home</a> / Request a quote</p>
+    <p class="crumbs"><a href="index.html">Home</a> / Contact us</p>
     <h1 style="margin-bottom:0.3em">Tell us what you need</h1>
-    <p>Send this and we'll get back to you — usually the same working day. Cleaning jobs start with a free assessment; laundry can be arranged right away.</p>
+    <p>Send this and we'll get back to you — usually the same working day. Cleaning jobs start with a free site assessment; laundry can usually be arranged straight away.</p>
   </div>
 </div>
 
@@ -59,24 +59,24 @@
           <ul class="errors" id="formErrors" hidden></ul>
 
           <fieldset>
-            <span class="fieldset-label">1. Which service do you need? <span class="hint">Pick the closest — we'll confirm the details with you.</span></span>
+            <span class="fieldset-label">1. Which service do you need? <span class="hint">Pick the closest — we'll discuss the details with you.</span></span>
             <div class="choice-grid" id="serviceOptions"><!-- filled from config.js --></div>
           </fieldset>
 
           <fieldset>
-            <span class="fieldset-label">2. When suits you?</span>
+            <span class="fieldset-label">2. When suits you? <span class="hint">Optional — leave blank if you'd like us to suggest a time.</span></span>
             <div class="field-row">
               <div class="field">
                 <label for="pickupDate">Preferred date</label>
-                <input type="date" id="pickupDate" required />
+                <input type="date" id="pickupDate" />
               </div>
               <div class="field">
                 <label for="slot">Time window</label>
-                <select id="slot" required></select>
+                <select id="slot"></select>
               </div>
             </div>
             <div class="field" style="margin-bottom:0">
-              <label for="frequency">How often? <span class="hint">Recurring contracts are welcome.</span></label>
+              <label for="frequency">How often do you need us?</label>
               <select id="frequency">
                 <option value="one-off">Just this once</option>
                 <option value="weekly">Every week</option>
@@ -87,15 +87,8 @@
             </div>
           </fieldset>
 
-          <fieldset id="itemsFieldset">
-            <span class="fieldset-label">3. Laundry items <span class="hint">Optional — this builds your estimate.</span></span>
-            <div id="itemRows"></div>
-            <button type="button" class="btn btn-ghost btn-sm" id="addItem">+ Add another item</button>
-            <div class="estimate" id="estimate" style="margin-top:1rem"></div>
-          </fieldset>
-
           <fieldset>
-            <span class="fieldset-label">4. The location</span>
+            <span class="fieldset-label">3. The location</span>
             <div class="field-row">
               <div class="field">
                 <label for="area">Area</label>
@@ -109,7 +102,7 @@
           </fieldset>
 
           <fieldset>
-            <span class="fieldset-label">5. How do we reach you?</span>
+            <span class="fieldset-label">4. How do we reach you?</span>
             <div class="field-row">
               <div class="field">
                 <label for="name">Full name</label>
@@ -121,28 +114,18 @@
               </div>
             </div>
             <div class="field">
-              <label for="email">Email <span class="hint">Optional — for written quotes and invoices.</span></label>
+              <label for="email">Email <span class="hint">Optional — handy for written quotes and invoices.</span></label>
               <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
             </div>
           </fieldset>
 
           <div class="field">
-            <label for="payment">How would you prefer to pay?</label>
-            <select id="payment">
-              <option value="momo">Mobile Money</option>
-              <option value="cash">Cash</option>
-              <option value="transfer">Bank transfer</option>
-              <option value="invoice">Invoice my company (monthly)</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="notes">Tell us about the job <span class="hint">Size of the space, number of rooms, frequency, anything special.</span></label>
+            <label for="notes">Tell us about the job <span class="hint">Size of the space, number of rooms, how often, anything special.</span></label>
             <textarea id="notes" placeholder="e.g. 3-bedroom apartment, deep clean before we move in. Or: 9 hotel rooms plus reception, twice a week."></textarea>
           </div>
 
-          <button class="btn btn-primary btn-wide" id="submitBtn" type="submit">Send my request</button>
-          <p class="fineprint">Submitting this doesn't commit you to anything. There's no charge for an assessment or a quote, and nothing is paid now.</p>
+          <button class="btn btn-primary btn-wide" id="submitBtn" type="submit">Send my enquiry</button>
+          <p class="fineprint">Submitting this doesn't commit you to anything. There's no charge for an assessment, and nothing is paid now.</p>
         </form>
 
         <!-- ---------------------------- SUCCESS ---------------------------- -->
@@ -150,13 +133,13 @@
           <div class="tick">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>
           </div>
-          <h2>Request received — thank you!</h2>
-          <p>We've got your details. Someone will call or message you shortly to confirm, and to arrange an assessment if it's a cleaning job.</p>
+          <h2>Enquiry received — thank you!</h2>
+          <p>We've got your details. Someone will call or message you shortly to talk it through, and to arrange an assessment if it's a cleaning job.</p>
           <div class="ref-box">
             <span>Your reference</span>
             <strong id="refOut">NB-000000-XXXX</strong>
           </div>
-          <p class="muted" style="font-size:0.92rem">Keep this reference. Quote it on WhatsApp or when you call and we'll pull up your request straight away.</p>
+          <p class="muted" style="font-size:0.92rem">Keep this reference. Quote it on WhatsApp or when you call and we'll pull up your enquiry straight away.</p>
           <div class="hero-cta">
             <a class="btn btn-wa" id="waConfirm" href="#" target="_blank" rel="noopener">Send it on WhatsApp too</a>
             <a class="btn btn-ghost" href="index.html">Back to home</a>
@@ -169,18 +152,18 @@
         <div class="aside-card">
           <h3>What happens next</h3>
           <ul>
-            <li>We call or WhatsApp you to confirm the details.</li>
-            <li>For cleaning jobs, we arrange a free site assessment and send a written quote.</li>
-            <li>For laundry, we collect, weigh and confirm the price before we start.</li>
+            <li>We call or WhatsApp you to talk through what you need.</li>
+            <li>For cleaning jobs, we arrange a <strong>free site assessment</strong> — no cost, no obligation.</li>
+            <li>We agree the scope and schedule with you before any work starts.</li>
           </ul>
         </div>
         <div class="aside-card">
           <h3>Good to know</h3>
           <ul>
-            <li>Free assessment and quote — no obligation.</li>
+            <li>Free assessment and quotation, with no obligation.</li>
             <li>Our team brings its own equipment and supplies.</li>
-            <li>Pay by MoMo, cash, bank transfer or monthly invoice.</li>
-            <li>Business contracts: daily, weekly or fortnightly schedules.</li>
+            <li>Contracts run daily, weekly or fortnightly.</li>
+            <li>Monthly invoicing available for business clients.</li>
           </ul>
         </div>
         <div class="aside-card" style="background:var(--aqua-soft);border-color:#bfe6e2">
@@ -198,7 +181,7 @@
   <div class="wrap">
     <div class="footer-bottom" style="border:0;margin:0;padding:0">
       <span>© <span data-year>2026</span> <span data-site="fullName">N&amp;B Solutions</span>. A registered company in Ghana.</span>
-      <span><a href="index.html">Home</a> · <a href="index.html#pricing">Pricing</a> · <a href="admin.html">Staff login</a></span>
+      <span><a href="index.html">Home</a> · <a href="index.html#about">Profile</a> · <a href="admin.html">Staff login</a></span>
     </div>
   </div>
 </footer>
