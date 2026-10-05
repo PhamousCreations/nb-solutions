@@ -87,9 +87,13 @@ GET  /api/health
 ### Admin dashboard
 
 Default key: `freshfold-admin` (change it before going live — see below).
-Bookings are stored in `data/bookings.json`, which comes pre-loaded with 3 sample
-orders so the dashboard isn't empty. Delete them when you're ready for real data
-(keep the `{"bookings": []}` structure).
+Bookings are stored in `data/bookings.json`, which ships with 3 sample orders so the
+dashboard isn't empty when you first look at it. Delete them when you're ready for real
+data (keep the `{"bookings": []}` structure).
+
+Note that `data/bookings.json` is in `.gitignore` on purpose: it holds customer names,
+phone numbers and addresses, so it never leaves your server. Your deployed site starts
+with an empty dashboard, which is exactly what you want.
 
 ---
 
