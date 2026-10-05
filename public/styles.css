@@ -707,3 +707,53 @@ fieldset { border: 0; padding: 0; margin: 0 0 1.3rem; }
   color: var(--ink);
   margin-top: 1.4rem;
 }
+
+/* ==========================================================================
+   Photography
+   ========================================================================== */
+
+.photo-band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.3rem;
+}
+.photo-band figure { margin: 0; }
+.photo-band img {
+  width: 100%;
+  height: clamp(230px, 30vw, 320px);
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  display: block;
+  box-shadow: var(--shadow);
+}
+.photo-band figcaption {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-top: 0.7rem;
+}
+@media (max-width: 700px) { .photo-band { grid-template-columns: 1fr; } }
+
+/* contact page: reach us panel */
+.info-list { list-style: none; padding: 0; margin: 0; }
+.info-list li {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 0.85rem 0;
+  border-bottom: 1px dashed var(--line);
+}
+.info-list li:last-child { border-bottom: 0; }
+.info-list svg { width: 21px; height: 21px; color: var(--aqua); flex: none; margin-top: 4px; }
+.info-list strong { display: block; color: var(--ink); font-size: 0.92rem; }
+.info-list a, .info-list span.val { font-size: 0.95rem; }
+
+.brand-panel {
+  background: linear-gradient(135deg, var(--aqua) 0%, var(--aqua-dark) 100%);
+  color: #eafaf8;
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.8rem;
+  box-shadow: var(--shadow);
+}
+.brand-panel h3 { color: #fff; }
+.brand-panel p { margin: 0; font-size: 0.94rem; color: #d5f2ef; }
+.brand-panel .reg-pill { background: rgba(255,255,255,.18); color: #fff; margin-bottom: 0.9rem; }

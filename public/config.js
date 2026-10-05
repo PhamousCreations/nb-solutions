@@ -25,18 +25,22 @@ window.SITE = {
   // row is hidden automatically everywhere on the site.
   email: '',
 
-  // PLACEHOLDER — replace with your business / registered address
-  address: 'Greater Accra, Ghana',
+  // Based in Takoradi, serving the Western Region
+  address: 'Takoradi, Western Region, Ghana',
+  city: 'Takoradi',
+  region: 'Western Region',
+
   // PLACEHOLDER — confirm your real hours
   hours: 'Monday to Saturday',
   hoursSunday: 'Evening &amp; weekend work available for commercial clients',
 
   /* ------------------------- coverage & scheduling ----------------------- */
   /* PLACEHOLDER — trim this to the areas you actually cover.
-     It fills the contact form's area dropdown. */
+     It fills the enquiry form's area dropdown. */
   areas: [
-    'Accra Central', 'East Legon', 'Airport Residential', 'Labone', 'Cantonments',
-    'Osu', 'Spintex', 'Dansoman', 'Madina', 'Achimota', 'Tema', 'Other / ask us',
+    'Takoradi', 'Effia-Nkwanta', 'Kwesimintsim', 'Anaji', 'Airport Ridge',
+    'Apremdo', 'Beach Road', 'Sekondi', 'Ketan', 'Essikado',
+    'Tarkwa (larger jobs)', 'Other / ask us',
   ],
   timeSlots: ['08:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00'],
 
@@ -56,7 +60,8 @@ window.SITE = {
 
   /* ----------------------------- who we serve ---------------------------- */
   /* The client groups the business targets. Shown as a section on the home
-     page and in the enquiry form's "type of client" options. */
+     page and in the enquiry form. Available icons: office, hotel, factory,
+     school, home, event. */
   sectors: [
     { icon: 'office',   title: 'Offices & corporate',   text: 'Regular cleaning for offices, banks, shops and shared workspaces — scheduled around your working hours.' },
     { icon: 'hotel',    title: 'Hotels & guesthouses',  text: 'Guest rooms, bathrooms, lobbies and corridors, plus fast turnarounds between check-out and check-in.' },

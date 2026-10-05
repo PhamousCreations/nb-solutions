@@ -49,6 +49,7 @@ these in their dashboard instead.
 | | |
 |---|---|
 | Company name | N&B Solutions (registered in Ghana) |
+| Based in | **Takoradi**, Western Region |
 | Founder | Benjamin Ansah |
 | Phone (calls) | +233 59 613 4611 |
 | WhatsApp | +233 55 396 5448 |
@@ -61,15 +62,15 @@ these in their dashboard instead.
 
 - [ ] **Email address** — add it to `public/config.js` (`email: ''`) and the email row
       reappears automatically in the contact section and footer.
-- [ ] **Business address / registered office** — currently reads "Greater Accra, Ghana".
+- [ ] **Street address / registered office** — currently reads "Takoradi, Western Region,
+      Ghana". Add the specific address or P.O. Box if you want it published.
 - [ ] **Opening hours** — currently "Monday to Saturday".
-- [ ] **Real service areas** — the site lists Accra neighbourhoods as a starting set.
-      Trim `areas` in `config.js` to what you actually cover, then update the chips on
-      the home page contact section.
+- [ ] **Confirm service areas** — the site now lists Takoradi and Western Region
+      neighbourhoods (Effia-Nkwanta, Kwesimintsim, Anaji, Airport Ridge, Apremdo,
+      Beach Road, Sekondi, Ketan, Essikado). Trim `areas` in `config.js` to what you
+      actually cover, then adjust the chips on the home page contact section.
 - [ ] **Registration number** — nice for trust once you have it to hand.
-- [ ] **Photographs** — real photos of the team and finished jobs would lift this a lot.
-      Ask me and I'll add a gallery section with the images you supply ("before you
-      send photos, read the note in *Photographs* below).
+- [ ] **More photographs** — see *Photographs* below for what's in use and what's needed.
 
 ---
 
@@ -111,6 +112,44 @@ every enquiry becomes a conversation. If you'd rather show indicative rates for 
 later, say the word and I'll add a rate card back.
 
 ---
+
+## Photographs
+
+Every image on the site is in `public/images/`. To swap one, replace the file using the
+same filename — no code changes needed.
+
+| File | Used for | Status |
+|---|---|---|
+| `team-cleaning.jpg` | Photo band under the hero: "Our team at work" | ✅ In use |
+| `cleaning-supplies.jpg` | Photo band under the hero: "We arrive with our own equipment" | ✅ In use |
+
+### A note on the images you sent
+
+Five files came through. Two are on the site; three were left out, for these reasons:
+
+1. **`image-3.jpeg` — a photo of a cleaner with a bucket labelled "SQUEAKY CLEAN
+   SERVICES, Takoradi".** This is another Takoradi company's branded equipment, so it
+   can't be published as N&B Solutions' work — and because they trade in the same city,
+   it isn't a "nobody will notice" risk. Left out entirely.
+2. **`image-4.jpeg` and `image-5.jpeg` — byte-identical duplicates of each other**, and
+   both carry a visible stock-library watermark over the bucket. Left out because of the
+   watermark; and only one was ever going to be usable.
+
+### Worth knowing about the two in use
+
+Both are professional stock photographs rather than pictures of your own team. They're
+safe to use — but two honest points:
+
+- If a client asks "is that your team?", the answer should be no. The caption wording
+  ("Our team at work") describes the *service*, not the individuals, but you may prefer
+  to reword it.
+- **Your own photographs will outperform these every time.** For a local services
+  business, a slightly imperfect phone photo of a real Takoradi job converts better than
+  a polished generic one, because it's proof rather than a claim.
+
+**What to send for a stronger gallery:** photos of your team in N&B uniforms or
+branded shirts, before/after pairs of a room or an office, your equipment and van, a
+hotel or office you've cleaned (with the client's permission), and your founder.
 
 ## How enquiries work
 
