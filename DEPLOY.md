@@ -1,4 +1,4 @@
-# Putting FreshFold online
+# Putting N&B Solutions online
 
 From this folder to a live website with your own domain. About 15 minutes.
 
@@ -19,11 +19,11 @@ git config user.email "you@example.com"
 ```
 
 Then create an **empty** repository on GitHub (no README, no .gitignore — click
-"New repository", name it `freshfold-laundry`, and leave everything else blank).
+"New repository", name it `nb-solutions`, and leave everything else blank).
 GitHub will show you a page with commands; you only need these two:
 
 ```bash
-git remote add origin https://github.com/YOUR-USERNAME/freshfold-laundry.git
+git remote add origin https://github.com/YOUR-USERNAME/nb-solutions.git
 git push -u origin main
 ```
 
@@ -34,8 +34,8 @@ git init -b main
 git config user.name "Your Name"
 git config user.email "you@example.com"
 git add .
-git commit -m "FreshFold laundry and cleaning website"
-git remote add origin https://github.com/YOUR-USERNAME/freshfold-laundry.git
+git commit -m "N&B Solutions cleaning and laundry website"
+git remote add origin https://github.com/YOUR-USERNAME/nb-solutions.git
 git push -u origin main
 ```
 
@@ -54,9 +54,9 @@ with the `repo` scope. Paste it in place of the password.
 
 1. Sign up with your GitHub account.
 2. Click **New +** → **Blueprint**.
-3. Pick your `freshfold-laundry` repository. Render finds `render.yaml` and shows the plan.
+3. Pick your `nb-solutions` repository. Render finds `render.yaml` and shows the plan.
 4. Click **Apply**. Your site builds and goes live at something like
-   `https://freshfold-laundry.onrender.com`.
+   `https://nb-solutions.onrender.com`.
 5. Go to **Environment** and copy the `ADMIN_KEY` value Render generated. That's the
    password for your staff dashboard at `/admin`.
 
@@ -92,7 +92,7 @@ multi-user safe, which is worth it once orders get busy.
 
 1. Buy a `.com` (about $12/year from Namecheap or Porkbun) or a `.com.gh` from a local
    registrar. `.com` is cheaper and works fine for a Ghana business.
-2. In Render: your service → **Settings** → **Custom Domains** → add `freshfold.gh`
+2. In Render: your service → **Settings** → **Custom Domains** → add `nbsolutions.gh`
    (or whatever you bought).
 3. Render shows you a CNAME or A record. Add it where you bought the domain, in their
    DNS settings. Wait 10–60 minutes.

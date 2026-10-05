@@ -7,7 +7,7 @@
 
 services:
   - type: web
-    name: freshfold-laundry
+    name: nb-solutions
     runtime: node
     region: frankfurt      # closest Render region to Accra (lower latency than Oregon)
     plan: free             # free tier sleeps after 15 min idle; upgrade for always-on
@@ -25,7 +25,7 @@ services:
     # whenever the service restarts or redeploys.
     #
     # For a real business, upgrade to a paid instance and uncomment the block
-    # below, which keeps data/bookings.json on a persistent disk.
+    # below, which keeps bookings.json on a persistent disk.
     # -----------------------------------------------------------------------
     # disk:
     #   name: bookings-data

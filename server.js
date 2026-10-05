@@ -1,10 +1,12 @@
 /**
- * FreshFold Laundry & Cleaning — zero-dependency web server
- * Serves the static site from /public and a small JSON API for bookings.
+ * N&B Solutions — cleaning & laundry services website
+ * Zero-dependency web server: serves the static site from /public and a small
+ * JSON API for booking/quote requests.
  *
- *   node server.js            -> http://localhost:3000
- *   PORT=8080 node server.js  -> custom port
- *   ADMIN_KEY=mysecret node server.js
+ *   node server.js                     -> http://localhost:3000
+ *   PORT=8080 node server.js           -> custom port
+ *   ADMIN_KEY=mysecret node server.js  -> your own dashboard password
+ *   DATA_DIR=/var/data node server.js  -> store requests on a persistent disk
  */
 
 const http = require('http');
@@ -19,7 +21,7 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_FILE = process.env.DATA_DIR
   ? path.join(process.env.DATA_DIR, 'bookings.json')
   : path.join(__dirname, 'data', 'bookings.json');
-const ADMIN_KEY = process.env.ADMIN_KEY || 'freshfold-admin';
+const ADMIN_KEY = process.env.ADMIN_KEY || 'nb-solutions-admin';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -37,7 +39,9 @@ const MIME = {
 };
 
 const STATUSES = ['new', 'confirmed', 'picked-up', 'delivered', 'cancelled'];
-const SERVICES = ['laundry', 'dry-cleaning', 'ironing', 'home-cleaning', 'deep-cleaning', 'mixed'];
+// Service values are defined in public/config.js so the owner can add or rename
+// services without touching this file. Validate the shape instead of a fixed list.
+const SERVICE_RE = /^[a-z][a-z0-9-]{2,40}$/;
 
 /* ---------------------------------- data ---------------------------------- */
 
@@ -65,7 +69,7 @@ function makeRef() {
     String(d.getMonth() + 1).padStart(2, '0') +
     String(d.getDate()).padStart(2, '0');
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `FF-${stamp}-${rand}`;
+  return `NB-${stamp}-${rand}`;
 }
 
 /* -------------------------------- helpers --------------------------------- */
@@ -110,7 +114,10 @@ function readBody(req) {
   });
 }
 
-const str = (v, max = 100) => String(v == null ? '' : v).trim().slice(0, max);
+// Trim, cap length, and drop angle brackets so no one can store markup
+// through the booking form. The dashboard escapes as well, belt and braces.
+const str = (v, max = 100) =>
+  String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, max);
 
 function validateBooking(input) {
   const errors = [];
@@ -132,7 +139,7 @@ function validateBooking(input) {
   if (b.name.length < 2) errors.push('Please enter your full name.');
   if (!/^[+()\-\s\d]{7,24}$/.test(b.phone)) errors.push('Please enter a valid phone number.');
   if (b.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email)) errors.push('That email address looks invalid.');
-  if (!SERVICES.includes(b.service)) errors.push('Please choose a service.');
+  if (!SERVICE_RE.test(b.service)) errors.push('Please choose a service.');
   if (b.area.length < 2) errors.push('Please choose your area.');
   if (b.address.length < 5) errors.push('Please give us a pickup address (at least 5 characters).');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(b.pickupDate)) {
@@ -169,7 +176,7 @@ async function handleApi(req, res, url) {
 
   // GET /api/health
   if (parts[0] === 'health' && method === 'GET') {
-    return send(res, 200, { ok: true, service: 'freshfold-api', time: new Date().toISOString() });
+    return send(res, 200, { ok: true, service: 'nb-solutions-api', time: new Date().toISOString() });
   }
 
   // POST /api/bookings
@@ -277,5 +284,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`FreshFold site running on http://localhost:${PORT}  (admin key: ${ADMIN_KEY})`);
+  console.log(`N&B Solutions site running on http://localhost:${PORT}  (admin key: ${ADMIN_KEY})`);
 });

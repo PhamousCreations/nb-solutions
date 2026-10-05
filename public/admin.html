@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bookings dashboard — %SITE%</title>
+<title>Staff dashboard — %SITE%</title>
 <meta name="robots" content="noindex" />
 <meta name="theme-color" content="#10393f" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2310393f'/%3E%3Ccircle cx='16' cy='19' r='7' fill='none' stroke='white' stroke-width='2.6'/%3E%3Ccircle cx='16' cy='8' r='2' fill='%23ffc24b'/%3E%3C/svg%3E" />
@@ -15,17 +15,17 @@
     <a class="brand" href="index.html">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
         <rect width="48" height="48" rx="14" fill="#10393f" />
-        <circle cx="24" cy="29" r="11" fill="none" stroke="#ffffff" stroke-width="3.2" />
-        <circle cx="24" cy="12" r="3" fill="#ffc24b" />
+        <path d="M24 9l2.5 7 7 2.5-7 2.5-2.5 7-2.5-7-7-2.5 7-2.5z" fill="#ffffff" />
+        <path d="M33.5 27c2 2.4 3 4.2 3 5.6a3 3 0 0 1-6 0c0-1.4 1-3.2 3-5.6z" fill="#ffc24b" />
       </svg>
       <span>
-        <span class="brand-name" data-site="name">FreshFold</span>
+        <span class="brand-name" data-site="name">N&amp;B Solutions</span>
         <span class="brand-sub">Staff dashboard</span>
       </span>
     </a>
     <nav class="site-nav" aria-label="Main" style="position:static;display:flex">
       <a href="index.html">View website</a>
-      <a href="book.html">New booking</a>
+      <a href="book.html">New request</a>
     </nav>
   </div>
 </header>
@@ -34,8 +34,8 @@
   <div class="page-head">
     <div class="wrap">
       <span class="eyebrow">Internal</span>
-      <h1 style="margin-bottom:0.3em">Bookings dashboard</h1>
-      <p>Every request from the website lands here. Update the status as each order moves through the wash.</p>
+      <h1 style="margin-bottom:0.3em">Requests dashboard</h1>
+      <p>Every quote request and booking from the website lands here. Update the status as each job moves along.</p>
     </div>
   </div>
 
@@ -44,7 +44,7 @@
       <div class="admin-bar">
         <div class="field">
           <label for="adminKey">Admin key</label>
-          <input type="text" id="adminKey" value="freshfold-admin" autocomplete="off" />
+          <input type="text" id="adminKey" value="nb-solutions-admin" autocomplete="off" />
         </div>
         <button class="btn btn-primary" id="adminLoad">Load bookings</button>
         <div class="field">
@@ -69,7 +69,7 @@
 
       <p class="fineprint" style="margin-top:2rem">
         Change the admin key by starting the server with <code>ADMIN_KEY=yourkey node server.js</code>.
-        Bookings are saved in <code>data/bookings.json</code> — back that file up, and keep this page unlisted.
+        Requests are saved in <code>data/bookings.json</code> — back that file up, and keep this page unlisted.
       </p>
     </div>
   </section>
@@ -78,7 +78,7 @@
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer-bottom" style="border:0;margin:0;padding:0">
-      <span>© <span data-year>2026</span> <span data-site="fullName">FreshFold</span> — internal use only.</span>
+      <span>© <span data-year>2026</span> <span data-site="fullName">N&amp;B Solutions</span> — internal use only.</span>
     </div>
   </div>
 </footer>

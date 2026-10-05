@@ -1,4 +1,4 @@
-# FreshFold — container image
+# N&B Solutions — container image
 # Works on Fly.io, Railway, a VPS, or anything that runs Docker.
 # Zero dependencies, so the image is tiny and builds in seconds.
 

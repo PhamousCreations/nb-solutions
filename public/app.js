@@ -1,4 +1,4 @@
-/* FreshFold — shared front-end logic (no dependencies) */
+/* N&B Solutions — shared front-end logic (no dependencies) */
 (function () {
   'use strict';
 
@@ -6,6 +6,14 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const money = (n) => S.currency + ' ' + Number(n).toLocaleString('en-GH');
+
+  /* Escape anything that came from a visitor before putting it in the page.
+     Bookings are free text, so this stops someone typing HTML into the form
+     and having it run in your staff dashboard. */
+  const esc = (v) =>
+    String(v == null ? '' : v).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
 
   function waLink(extra) {
     const text = (extra ? extra + '\n\n' : '') + (S.whatsappMessage || '');
@@ -18,10 +26,10 @@
       name: S.name,
       fullName: S.fullName,
       tagline: S.tagline,
-      // "phone" in the HTML maps to phoneDisplay in config.js
-      phone: S.phoneDisplay,
+      founder: S.founder,
+      phone: S.phoneDisplay,          // html uses data-site="phone"
       phoneDisplay: S.phoneDisplay,
-      currency: S.currency,
+      whatsappDisplay: S.whatsappDisplay,
       email: S.email,
       address: S.address,
       hours: S.hours,
@@ -29,7 +37,7 @@
     };
     $$('[data-site]').forEach((el) => {
       const v = map[el.dataset.site];
-      if (v != null) el.textContent = v;
+      if (v != null && v !== '') el.textContent = v;
     });
     $$('[data-site-href]').forEach((el) => {
       const key = el.dataset.siteHref;
@@ -41,6 +49,16 @@
         el.rel = 'noopener';
       }
     });
+
+    /* No email address yet? Hide those rows rather than showing a dead link.
+       Add one in config.js and they reappear everywhere automatically. */
+    if (!S.email) {
+      $$('[data-site="email"], [data-site-href="email"]').forEach((el) => {
+        const row = el.closest('li') || el.closest('.contact-row');
+        (row || el).hidden = true;
+      });
+    }
+
     $$('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
     document.title = document.title.replace(/%SITE%/g, S.fullName || S.name || '');
   }
@@ -85,7 +103,7 @@
       tbody.innerHTML = S.laundryPrices
         .map(
           (p) => `<tr>
-            <td><strong>${p.name}</strong>${p.note ? `<span class="price-note">${p.note}</span>` : ''}</td>
+            <td><strong>${esc(p.name)}</strong>${p.note ? `<span class="price-note">${esc(p.note)}</span>` : ''}</td>
             <td class="price-cell">${money(p.price)}</td>
           </tr>`
         )
@@ -98,13 +116,26 @@
     const form = $('#bookingForm');
     if (!form) return;
 
+    /* Service choices come from config.js so this list stays in sync with
+       whatever services the business offers. */
+    const optsBox = $('#serviceOptions');
+    if (optsBox && Array.isArray(S.services)) {
+      optsBox.innerHTML = S.services
+        .map(
+          (s, i) => `<label class="choice">
+            <input type="radio" name="servicePick" value="${esc(s.value)}"${i === 0 ? ' checked' : ''} />
+            <span>${esc(s.label)}${s.hint ? `<small>${esc(s.hint)}</small>` : ''}</span>
+          </label>`
+        )
+        .join('');
+    }
+
     const areaSel = $('#area');
-    if (areaSel) areaSel.innerHTML = '<option value="">Select your area…</option>' + (S.areas || []).map((a) => `<option>${a}</option>`).join('');
+    if (areaSel) areaSel.innerHTML = '<option value="">Select your area…</option>' + (S.areas || []).map((a) => `<option>${esc(a)}</option>`).join('');
 
     const slotSel = $('#slot');
-    if (slotSel) slotSel.innerHTML = '<option value="">Select a window…</option>' + (S.timeSlots || []).map((t) => `<option>${t}</option>`).join('');
+    if (slotSel) slotSel.innerHTML = '<option value="">Select a window…</option>' + (S.timeSlots || []).map((t) => `<option>${esc(t)}</option>`).join('');
 
-    // min pickup date = today (Accra)
     const dateInput = $('#pickupDate');
     if (dateInput) {
       const today = new Date();
@@ -114,8 +145,9 @@
 
     const itemsBox = $('#itemRows');
     const prices = S.laundryPrices || [];
+    const cleaningSet = S.cleaningValues || [];
 
-    // Service can be a <select id="service"> or radio inputs named "servicePick"
+    // Service can be radio inputs (name="servicePick") or a <select id="service">
     function getService() {
       const sel = $('#service');
       if (sel) return sel.value;
@@ -128,7 +160,7 @@
       row.className = 'item-row';
       row.innerHTML = `
         <select class="item-name" aria-label="Item type">
-          ${prices.map((p) => `<option value="${p.name}" data-price="${p.price}">${p.name}</option>`).join('')}
+          ${prices.map((p) => `<option value="${esc(p.name)}" data-price="${p.price}">${esc(p.name)}</option>`).join('')}
         </select>
         <input class="item-qty" type="number" inputmode="numeric" min="1" max="999" value="1" aria-label="Quantity" />
         <button type="button" class="icon-btn remove-row" aria-label="Remove item">&times;</button>`;
@@ -161,11 +193,21 @@
 
     function updateEstimate() {
       const out = $('#estimate');
-      if (!out) return;
       const service = getService();
-      const cleaningOnly = service === 'home-cleaning' || service === 'deep-cleaning';
-      if (cleaningOnly) {
-        out.innerHTML = `Cleaning jobs are quoted per space — <strong>from ${money(150)}</strong>. We confirm the exact price before we start.`;
+      const isCleaning = cleaningSet.includes(service);
+
+      /* Cleaning is quoted per site, so the item list isn't relevant — hide it
+         rather than asking people to fill in a form that doesn't apply. */
+      const fs = $('#itemsFieldset');
+      if (fs) fs.hidden = isCleaning;
+
+      if (!out) return;
+      if (isCleaning) {
+        out.innerHTML = 'Cleaning is quoted per site, so there\'s no fixed price list. <strong>Submit this and we\'ll arrange a free assessment</strong>, then send you a written quote.';
+        return;
+      }
+      if (service === 'mixed') {
+        out.innerHTML = 'Mixed jobs are priced after we see the details — <strong>laundry by weight or item, cleaning after a free assessment.</strong>';
         return;
       }
       const total = currentItems().reduce((sum, it) => {
@@ -173,11 +215,11 @@
         return sum + (p ? p.price * it.qty : 0);
       }, 0);
       out.innerHTML = total
-        ? `Estimated total: <strong>${money(total)}</strong> <span class="muted">— confirmed after we weigh/inspect your items.</span>`
+        ? `Estimated total: <strong>${money(total)}</strong> <span class="muted">— confirmed when we weigh and count your items.</span>`
         : 'Add items above and we’ll show a running estimate.';
     }
 
-    addRow({ name: prices[0] ? prices[0].name : 'Wash & fold (per kg)', qty: 5 });
+    if (prices.length) addRow({ name: prices[0].name, qty: 5 });
     $('#addItem').addEventListener('click', () => addRow());
     const serviceSel = $('#service');
     if (serviceSel) serviceSel.addEventListener('change', updateEstimate);
@@ -186,7 +228,7 @@
 
     function showErrors(list) {
       const box = $('#formErrors');
-      box.innerHTML = list.map((e) => `<li>${e}</li>`).join('');
+      box.innerHTML = list.map((e) => `<li>${esc(e)}</li>`).join('');
       box.hidden = !list.length;
       if (list.length) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -207,7 +249,7 @@
         frequency: $('#frequency') ? $('#frequency').value : '',
         payment: $('#payment') ? $('#payment').value : 'cash',
         notes: $('#notes').value,
-        items: currentItems(),
+        items: cleaningSet.includes(getService()) ? [] : currentItems(),
       };
       btn.disabled = true;
       const label = btn.textContent;
@@ -225,7 +267,7 @@
         done.hidden = false;
         $('#refOut').textContent = data.ref;
         $('#waConfirm').href = waLink(
-          `Hi ${S.name}! I just booked a pickup. My reference is ${data.ref} (${payload.service} on ${payload.pickupDate}, ${payload.slot}).`
+          `Hello ${S.name}, I've just sent a request through your website. My reference is ${data.ref} (${payload.service} on ${payload.pickupDate}, ${payload.slot}).`
         );
         done.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err) {
@@ -241,10 +283,15 @@
   function initAdmin() {
     const app = $('#adminApp');
     if (!app) return;
-    const state = { key: localStorage.getItem('ff_key') || 'freshfold-admin', bookings: [], filter: 'all', q: '' };
+    const state = {
+      key: localStorage.getItem('nb_key') || 'nb-solutions-admin',
+      bookings: [],
+      filter: 'all',
+      q: '',
+    };
     $('#adminKey').value = state.key;
 
-    const badge = (s) => `<span class="badge badge-${s}">${s.replace('-', ' ')}</span>`;
+    const badge = (s) => `<span class="badge badge-${esc(s)}">${esc(s).replace('-', ' ')}</span>`;
 
     function render() {
       const list = state.bookings.filter(
@@ -257,29 +304,30 @@
         (s) => `<div class="stat"><span class="stat-num">${state.bookings.filter((b) => b.status === s).length}</span><span class="stat-label">${s.replace('-', ' ')}</span></div>`
       );
       $('#adminStats').innerHTML = stats.join('');
-      $('#adminCount').textContent = `${list.length} booking${list.length === 1 ? '' : 's'}`;
+      $('#adminCount').textContent = `${list.length} request${list.length === 1 ? '' : 's'}`;
       if (!list.length) {
-        $('#adminList').innerHTML = `<p class="empty">No bookings here yet. New requests from the website will appear automatically.</p>`;
+        $('#adminList').innerHTML = `<p class="empty">No requests here yet. New ones sent from the website will appear automatically.</p>`;
         return;
       }
       $('#adminList').innerHTML = list
         .map(
           (b) => `<article class="booking-card">
             <header>
-              <div><strong>${b.ref}</strong> ${badge(b.status)}</div>
+              <div><strong>${esc(b.ref)}</strong> ${badge(b.status)}</div>
               <time>${new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time>
             </header>
-            <p class="bk-main">${b.name} · <a href="tel:${b.phone.replace(/\s/g, '')}">${b.phone}</a></p>
-            <p class="bk-sub">${b.service.replace('-', ' ')} · ${b.area} · pickup ${b.pickupDate} (${b.slot}) · pay by ${b.payment}${b.frequency ? ' · ' + b.frequency : ''}</p>
-            <p class="bk-sub">${b.address}</p>
-            ${b.items && b.items.length ? `<ul class="bk-items">${b.items.map((i) => `<li>${i.qty} × ${i.name}</li>`).join('')}</ul>` : ''}
-            ${b.notes ? `<p class="bk-note">“${b.notes}”</p>` : ''}
+            <p class="bk-main">${esc(b.name)} · <a href="tel:${esc(String(b.phone).replace(/\s/g, ''))}">${esc(b.phone)}</a></p>
+            <p class="bk-sub">${esc(String(b.service).replace(/-/g, ' '))} · ${esc(b.area)} · ${esc(b.pickupDate)} (${esc(b.slot)}) · pay by ${esc(b.payment)}${b.frequency ? ' · ' + esc(b.frequency) : ''}</p>
+            <p class="bk-sub">${esc(b.address)}</p>
+            ${b.items && b.items.length ? `<ul class="bk-items">${b.items.map((i) => `<li>${esc(i.qty)} × ${esc(i.name)}</li>`).join('')}</ul>` : ''}
+            ${b.notes ? `<p class="bk-note">“${esc(b.notes)}”</p>` : ''}
+            ${b.email ? `<p class="bk-sub">✉ <a href="mailto:${esc(b.email)}">${esc(b.email)}</a></p>` : ''}
             <footer>
               ${['new', 'confirmed', 'picked-up', 'delivered', 'cancelled']
                 .filter((s) => s !== b.status)
-                .map((s) => `<button class="chip" data-ref="${b.ref}" data-status="${s}">Mark ${s.replace('-', ' ')}</button>`)
+                .map((s) => `<button class="chip" data-ref="${esc(b.ref)}" data-status="${esc(s)}">Mark ${esc(s).replace('-', ' ')}</button>`)
                 .join('')}
-              <button class="chip chip-wa" data-wa="${b.phone.replace(/\D/g, '')}" data-ref="${b.ref}">WhatsApp</button>
+              <button class="chip chip-wa" data-wa="${esc(String(b.phone).replace(/\D/g, ''))}" data-ref="${esc(b.ref)}">WhatsApp</button>
             </footer>
           </article>`
         )
@@ -288,10 +336,10 @@
 
     async function load() {
       state.key = $('#adminKey').value.trim();
-      localStorage.setItem('ff_key', state.key);
+      localStorage.setItem('nb_key', state.key);
       const res = await fetch('/api/bookings?key=' + encodeURIComponent(state.key));
       if (res.status === 401) {
-        $('#adminList').innerHTML = `<p class="empty">That admin key wasn’t accepted. Default key is <code>freshfold-admin</code> (change it with the ADMIN_KEY environment variable).</p>`;
+        $('#adminList').innerHTML = `<p class="empty">That admin key wasn’t accepted. The default is <code>nb-solutions-admin</code> — change it with the ADMIN_KEY environment variable.</p>`;
         $('#adminStats').innerHTML = '';
         return;
       }
@@ -316,12 +364,16 @@
       const btn = e.target.closest('button');
       if (!btn) return;
       if (btn.dataset.wa) {
-        window.open('https://wa.me/' + btn.dataset.wa + '?text=' + encodeURIComponent('Hi! This is ' + S.name + ' about your booking ' + btn.dataset.ref + '.'), '_blank');
+        window.open(
+          'https://wa.me/' + btn.dataset.wa + '?text=' +
+            encodeURIComponent('Hello, this is ' + (S.name || '') + ' about your request ' + btn.dataset.ref + '.'),
+          '_blank'
+        );
         return;
       }
       if (!btn.dataset.status) return;
       btn.disabled = true;
-      await fetch(`/api/bookings/${btn.dataset.ref}/status`, {
+      await fetch(`/api/bookings/${encodeURIComponent(btn.dataset.ref)}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: state.key, status: btn.dataset.status }),

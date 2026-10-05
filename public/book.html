@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Book a pickup — %SITE%</title>
-<meta name="description" content="Schedule a laundry or cleaning pickup in Accra. Choose your slot, list your items and get an instant estimate." />
+<title>Request a quote or booking — %SITE%</title>
+<meta name="description" content="Request a free assessment or arrange a laundry pickup with N&amp;B Solutions. Cleaning and laundry services for businesses, hotels and homes in Ghana." />
 <meta name="theme-color" content="#17a398" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2317a398'/%3E%3Ccircle cx='16' cy='19' r='7' fill='none' stroke='white' stroke-width='2.6'/%3E%3Ccircle cx='16' cy='8' r='2' fill='%23ffc24b'/%3E%3C/svg%3E" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2317a398'/%3E%3Cpath d='M16 6l1.9 5.2L23 13l-5.1 1.8L16 20l-1.9-5.2L9 13l5.1-1.8z' fill='white'/%3E%3Cpath d='M23 19c1.4 1.7 2.1 2.9 2.1 4a2.1 2.1 0 1 1-4.2 0c0-1.1.7-2.3 2.1-4z' fill='%23ffc24b'/%3E%3C/svg%3E" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -17,24 +17,25 @@
     <a class="brand" href="index.html">
       <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
         <rect width="48" height="48" rx="14" fill="#17a398" />
-        <circle cx="24" cy="29" r="11" fill="none" stroke="#ffffff" stroke-width="3.2" />
-        <circle cx="24" cy="12" r="3" fill="#ffc24b" />
+        <path d="M24 9l2.5 7 7 2.5-7 2.5-2.5 7-2.5-7-7-2.5 7-2.5z" fill="#ffffff" />
+        <path d="M33.5 27c2 2.4 3 4.2 3 5.6a3 3 0 0 1-6 0c0-1.4 1-3.2 3-5.6z" fill="#ffc24b" />
       </svg>
       <span>
-        <span class="brand-name" data-site="name">FreshFold</span>
-        <span class="brand-sub" data-site="tagline">Laundry &amp; cleaning</span>
+        <span class="brand-name" data-site="name">N&amp;B Solutions</span>
+        <span class="brand-sub" data-site="tagline">Cleaning &amp; laundry services</span>
       </span>
     </a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <nav class="site-nav" aria-label="Main">
       <a href="index.html#services">Services</a>
       <a href="index.html#how">How it works</a>
+      <a href="index.html#about">About us</a>
       <a href="index.html#pricing">Pricing</a>
       <a href="index.html#faq">FAQ</a>
       <a href="index.html#contact">Contact</a>
       <div class="nav-actions">
         <a class="btn btn-ghost btn-sm" data-site-href="phone" href="#">Call us</a>
-        <a class="btn btn-primary btn-sm" href="book.html">Book a pickup</a>
+        <a class="btn btn-primary btn-sm" href="book.html">Request a quote</a>
       </div>
     </nav>
   </div>
@@ -42,9 +43,9 @@
 
 <div class="page-head">
   <div class="wrap">
-    <p class="crumbs"><a href="index.html">Home</a> / Book a pickup</p>
-    <h1 style="margin-bottom:0.3em">Book your pickup</h1>
-    <p>Fill this in and we'll confirm by WhatsApp or phone within the hour. It takes about a minute — no account needed.</p>
+    <p class="crumbs"><a href="index.html">Home</a> / Request a quote</p>
+    <h1 style="margin-bottom:0.3em">Tell us what you need</h1>
+    <p>Send this and we'll get back to you — usually the same working day. Cleaning jobs start with a free assessment; laundry can be arranged right away.</p>
   </div>
 </div>
 
@@ -58,22 +59,15 @@
           <ul class="errors" id="formErrors" hidden></ul>
 
           <fieldset>
-            <span class="fieldset-label">1. What do you need? <span class="hint">Pick one — you can add more later.</span></span>
-            <div class="choice-grid">
-              <label class="choice"><input type="radio" name="servicePick" value="laundry" checked> <span>Wash &amp; fold<small>Per kg, everyday laundry</small></span></label>
-              <label class="choice"><input type="radio" name="servicePick" value="dry-cleaning"> <span>Dry cleaning<small>Suits, dresses, delicates</small></span></label>
-              <label class="choice"><input type="radio" name="servicePick" value="ironing"> <span>Ironing only<small>Already washed at home</small></span></label>
-              <label class="choice"><input type="radio" name="servicePick" value="home-cleaning"> <span>Home cleaning<small>Apartment or house</small></span></label>
-              <label class="choice"><input type="radio" name="servicePick" value="deep-cleaning"> <span>Deep cleaning<small>Move-in / move-out</small></span></label>
-              <label class="choice"><input type="radio" name="servicePick" value="mixed"> <span>A mix of the above<small>We'll sort it out</small></span></label>
-            </div>
+            <span class="fieldset-label">1. Which service do you need? <span class="hint">Pick the closest — we'll confirm the details with you.</span></span>
+            <div class="choice-grid" id="serviceOptions"><!-- filled from config.js --></div>
           </fieldset>
 
           <fieldset>
-            <span class="fieldset-label">2. When should we come?</span>
+            <span class="fieldset-label">2. When suits you?</span>
             <div class="field-row">
               <div class="field">
-                <label for="pickupDate">Pickup date</label>
+                <label for="pickupDate">Preferred date</label>
                 <input type="date" id="pickupDate" required />
               </div>
               <div class="field">
@@ -82,33 +76,34 @@
               </div>
             </div>
             <div class="field" style="margin-bottom:0">
-              <label for="frequency">How often? <span class="hint">Optional — recurring customers get 10% off.</span></label>
+              <label for="frequency">How often? <span class="hint">Recurring contracts are welcome.</span></label>
               <select id="frequency">
                 <option value="one-off">Just this once</option>
                 <option value="weekly">Every week</option>
                 <option value="fortnightly">Every two weeks</option>
                 <option value="monthly">Once a month</option>
+                <option value="contract">A regular contract — please call me</option>
               </select>
             </div>
           </fieldset>
 
-          <fieldset>
-            <span class="fieldset-label">3. Your items <span class="hint">Optional for cleaning jobs. This builds your estimate.</span></span>
+          <fieldset id="itemsFieldset">
+            <span class="fieldset-label">3. Laundry items <span class="hint">Optional — this builds your estimate.</span></span>
             <div id="itemRows"></div>
             <button type="button" class="btn btn-ghost btn-sm" id="addItem">+ Add another item</button>
             <div class="estimate" id="estimate" style="margin-top:1rem"></div>
           </fieldset>
 
           <fieldset>
-            <span class="fieldset-label">4. Where should we collect from?</span>
+            <span class="fieldset-label">4. The location</span>
             <div class="field-row">
               <div class="field">
                 <label for="area">Area</label>
                 <select id="area" required></select>
               </div>
               <div class="field">
-                <label for="address">Street / house / landmark</label>
-                <input type="text" id="address" placeholder="e.g. 14 Lagos Avenue, gate 4488" required />
+                <label for="address">Address / site / landmark</label>
+                <input type="text" id="address" placeholder="e.g. 14 Lagos Avenue, East Legon" required />
               </div>
             </div>
           </fieldset>
@@ -118,36 +113,36 @@
             <div class="field-row">
               <div class="field">
                 <label for="name">Full name</label>
-                <input type="text" id="name" placeholder="Your name" autocomplete="name" required />
+                <input type="text" id="name" placeholder="Your name or company" autocomplete="name" required />
               </div>
               <div class="field">
                 <label for="phone">Phone / WhatsApp</label>
-                <input type="tel" id="phone" placeholder="024 000 0000" autocomplete="tel" required />
+                <input type="tel" id="phone" placeholder="059 613 4611" autocomplete="tel" required />
               </div>
             </div>
             <div class="field">
-              <label for="email">Email <span class="hint">Optional — for the receipt.</span></label>
+              <label for="email">Email <span class="hint">Optional — for written quotes and invoices.</span></label>
               <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
             </div>
           </fieldset>
 
           <div class="field">
-            <label for="payment">How will you pay?</label>
+            <label for="payment">How would you prefer to pay?</label>
             <select id="payment">
               <option value="momo">Mobile Money</option>
-              <option value="cash">Cash on delivery</option>
-              <option value="card">Card on delivery</option>
-              <option value="invoice">Invoice my company</option>
+              <option value="cash">Cash</option>
+              <option value="transfer">Bank transfer</option>
+              <option value="invoice">Invoice my company (monthly)</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="notes">Anything we should know? <span class="hint">Gate code, stains, allergies, pets…</span></label>
-            <textarea id="notes" placeholder="e.g. Please use fragrance-free detergent, baby in the house."></textarea>
+            <label for="notes">Tell us about the job <span class="hint">Size of the space, number of rooms, frequency, anything special.</span></label>
+            <textarea id="notes" placeholder="e.g. 3-bedroom apartment, deep clean before we move in. Or: 9 hotel rooms plus reception, twice a week."></textarea>
           </div>
 
-          <button class="btn btn-primary btn-wide" id="submitBtn" type="submit">Confirm my pickup</button>
-          <p class="fineprint">By booking you agree to our terms. We'll confirm every booking by phone or WhatsApp before collecting — nothing is charged now.</p>
+          <button class="btn btn-primary btn-wide" id="submitBtn" type="submit">Send my request</button>
+          <p class="fineprint">Submitting this doesn't commit you to anything. There's no charge for an assessment or a quote, and nothing is paid now.</p>
         </form>
 
         <!-- ---------------------------- SUCCESS ---------------------------- -->
@@ -155,15 +150,15 @@
           <div class="tick">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>
           </div>
-          <h2>Pickup requested!</h2>
-          <p>We've got it. Someone will confirm your slot shortly — usually within the hour during opening times.</p>
+          <h2>Request received — thank you!</h2>
+          <p>We've got your details. Someone will call or message you shortly to confirm, and to arrange an assessment if it's a cleaning job.</p>
           <div class="ref-box">
             <span>Your reference</span>
-            <strong id="refOut">FF-000000-XXXX</strong>
+            <strong id="refOut">NB-000000-XXXX</strong>
           </div>
-          <p class="muted" style="font-size:0.92rem">Save this reference. Quote it on WhatsApp and we'll pull up your order instantly.</p>
+          <p class="muted" style="font-size:0.92rem">Keep this reference. Quote it on WhatsApp or when you call and we'll pull up your request straight away.</p>
           <div class="hero-cta">
-            <a class="btn btn-wa" id="waConfirm" href="#" target="_blank" rel="noopener">Confirm on WhatsApp</a>
+            <a class="btn btn-wa" id="waConfirm" href="#" target="_blank" rel="noopener">Send it on WhatsApp too</a>
             <a class="btn btn-ghost" href="index.html">Back to home</a>
           </div>
         </div>
@@ -174,25 +169,25 @@
         <div class="aside-card">
           <h3>What happens next</h3>
           <ul>
-            <li>We call or WhatsApp to confirm your slot.</li>
-            <li>A rider arrives in your window and counts your items with you.</li>
-            <li>Cleaned items come back in 48 hours, or 24 hours on express.</li>
+            <li>We call or WhatsApp you to confirm the details.</li>
+            <li>For cleaning jobs, we arrange a free site assessment and send a written quote.</li>
+            <li>For laundry, we collect, weigh and confirm the price before we start.</li>
           </ul>
         </div>
         <div class="aside-card">
           <h3>Good to know</h3>
           <ul>
-            <li>Free pickup &amp; delivery on orders above GH₵ 100.</li>
-            <li>Express (24 hrs) is +50%.</li>
-            <li>Pay by MoMo, cash or card on delivery.</li>
-            <li>Damage or loss covered up to GH₵ 500.</li>
+            <li>Free assessment and quote — no obligation.</li>
+            <li>Our team brings its own equipment and supplies.</li>
+            <li>Pay by MoMo, cash, bank transfer or monthly invoice.</li>
+            <li>Business contracts: daily, weekly or fortnightly schedules.</li>
           </ul>
         </div>
         <div class="aside-card" style="background:var(--aqua-soft);border-color:#bfe6e2">
-          <h3>Prefer to chat?</h3>
-          <p style="font-size:0.94rem">Send us your list on WhatsApp and we'll book it for you in seconds.</p>
-          <a class="btn btn-wa btn-wide" data-site-href="whatsapp" href="#">Message <span data-site="name">FreshFold</span></a>
-          <a class="btn btn-ghost btn-wide" style="margin-top:0.6rem" data-site-href="phone" href="#">Call <span data-site="phone">+233 20 000 0000</span></a>
+          <h3>Prefer to talk?</h3>
+          <p style="font-size:0.94rem">Call or message us and we'll take the details over the phone.</p>
+          <a class="btn btn-wa btn-wide" data-site-href="whatsapp" href="#">WhatsApp <span data-site="whatsappDisplay">+233 55 396 5448</span></a>
+          <a class="btn btn-ghost btn-wide" style="margin-top:0.6rem" data-site-href="phone" href="#">Call <span data-site="phone">+233 59 613 4611</span></a>
         </div>
       </aside>
     </div>
@@ -202,7 +197,7 @@
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer-bottom" style="border:0;margin:0;padding:0">
-      <span>© <span data-year>2026</span> <span data-site="fullName">FreshFold</span>.</span>
+      <span>© <span data-year>2026</span> <span data-site="fullName">N&amp;B Solutions</span>. A registered company in Ghana.</span>
       <span><a href="index.html">Home</a> · <a href="index.html#pricing">Pricing</a> · <a href="admin.html">Staff login</a></span>
     </div>
   </div>

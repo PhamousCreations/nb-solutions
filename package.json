@@ -1,7 +1,7 @@
 {
-  "name": "freshfold-laundry-site",
+  "name": "nb-solutions-website",
   "version": "1.0.0",
-  "description": "Laundry & cleaning service website with booking system and staff dashboard. Zero dependencies.",
+  "description": "N&B Solutions — cleaning and laundry services website with an enquiry/booking system and staff dashboard. Zero dependencies.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
