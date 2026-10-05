@@ -49,12 +49,14 @@ these in their dashboard instead.
 | | |
 |---|---|
 | Company name | N&B Solutions (registered in Ghana) |
-| Based in | **Takoradi**, Western Region |
+| Based in | **Apollo, Takoradi**, Western Region |
+| Tagline | Clean spaces · Fresh clothes · Better living |
 | Founder | Benjamin Ansah |
 | Phone (calls) | +233 59 613 4611 |
 | WhatsApp | +233 55 396 5448 |
-| Cleaning services | Deep, industrial, commercial, hotel & guesthouse, move-in/move-out, post-event |
-| Laundry services | Washing, ironing, drying, folding, stain treatment |
+| Services (from the flyer) | Residential cleaning, office cleaning, laundry (wash/dry/fold), ironing, deep cleaning |
+| Also offered | Commercial & retail, industrial, hotel & guesthouse, move-in/move-out, post-event |
+| Promises | Reliable service · Affordable rates · Customer satisfaction |
 | Vision / mission | On the About section of the home page |
 | Objectives | The six objectives are listed on the About section |
 
@@ -62,10 +64,14 @@ these in their dashboard instead.
 
 - [ ] **Email address** — add it to `public/config.js` (`email: ''`) and the email row
       reappears automatically in the contact section and footer.
-- [ ] **Street address / registered office** — currently reads "Takoradi, Western Region,
-      Ghana". Add the specific address or P.O. Box if you want it published.
+- [ ] **Confirm the WhatsApp number.** The flyer says **055 386 5448**; your earlier
+      message said **055 396 5448**. The site currently uses the flyer's number. One digit
+      differs — if you sent a customer to the wrong one, you'd never hear from them. Tell
+      me which is right and I'll switch it in one place.
+- [ ] **Full street address / P.O. Box** — currently reads "Apollo, Takoradi, Western
+      Region, Ghana".
 - [ ] **Opening hours** — currently "Monday to Saturday".
-- [ ] **Confirm service areas** — the site now lists Takoradi and Western Region
+- [ ] **Confirm service areas** — the site lists Apollo, Takoradi and Western Region
       neighbourhoods (Effia-Nkwanta, Kwesimintsim, Anaji, Airport Ridge, Apremdo,
       Beach Road, Sekondi, Ketan, Essikado). Trim `areas` in `config.js` to what you
       actually cover, then adjust the chips on the home page contact section.
@@ -112,6 +118,26 @@ every enquiry becomes a conversation. If you'd rather show indicative rates for 
 later, say the word and I'll add a rate card back.
 
 ---
+
+## Brand identity (from the flyer)
+
+The site's colours are taken from your flyer, so the website, the flyer, the logo and any
+signage or uniforms all match:
+
+| Token | Colour | Used for |
+|---|---|---|
+| `--ink` | Navy `#16294a` | Headlines, logo square, footer |
+| `--brand` | Green `#7ac142` | Buttons, icons, the wave in the logo |
+| `--navy` | Blue `#1b4b8f` | Secondary accents |
+| `--danger` | Red `#d9483b` | Form errors only |
+
+The logo in the header and footer is an SVG version of your flyer's house-and-wave mark.
+It's inline in each HTML file (search for `brand-mark`), so it needs no image file.
+
+**Wording taken from the flyer:** the tagline *"Clean spaces · Fresh clothes · Better
+living"*, the closing line *"Clean today, fresh tomorrow."*, the five headline services,
+the three promises (Reliable service, Affordable rates, Customer satisfaction) and the
+location — Apollo, Takoradi.
 
 ## Photographs
 

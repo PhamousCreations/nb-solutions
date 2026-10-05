@@ -2,31 +2,33 @@
  * N&B SOLUTIONS — ONE PLACE TO EDIT YOUR CONTACT DETAILS AND SERVICES.
  *
  * Change the values below and every page updates itself.
- * Anything marked PLACEHOLDER is placeholder data you should confirm or replace.
+ * Details below are taken from the company flyer and your messages.
  * ------------------------------------------------------------------------- */
 window.SITE = {
   /* ------------------------------ identity ------------------------------ */
   name: 'N&B Solutions',
   fullName: 'N&B Solutions',
   tagline: 'Cleaning & laundry services',
+  // The company tagline, from the flyer
+  slogan: 'Clean spaces · Fresh clothes · Better living',
   founder: 'Benjamin Ansah',
 
   /* ------------------------------ contact ------------------------------- */
-  // Shown to customers. Use the international format so it also works
-  // for clients calling from outside Ghana.
-  phoneDisplay: '+233 59 613 4611',       // calls
+  phoneDisplay: '+233 59 613 4611',       // calls — from the flyer
   phoneRaw: '+233596134611',              // used for click-to-call, no spaces
 
-  whatsapp: '233553965448',               // country code, no + or spaces
-  whatsappDisplay: '+233 55 396 5448',
+  // From the flyer. NOTE: you gave me a different number earlier
+  // (+233 55 396 5448) — please double-check which one is correct.
+  whatsapp: '233553865448',
+  whatsappDisplay: '+233 55 386 5448',
   whatsappMessage: "Hello N&B Solutions, I'd like to enquire about your cleaning and laundry services.",
 
   // ADD YOUR EMAIL HERE when you have it. While this is empty, the email
   // row is hidden automatically everywhere on the site.
   email: '',
 
-  // Based in Takoradi, serving the Western Region
-  address: 'Takoradi, Western Region, Ghana',
+  // Located in Apollo, Takoradi — per the flyer
+  address: 'Apollo, Takoradi, Western Region, Ghana',
   city: 'Takoradi',
   region: 'Western Region',
 
@@ -38,20 +40,24 @@ window.SITE = {
   /* PLACEHOLDER — trim this to the areas you actually cover.
      It fills the enquiry form's area dropdown. */
   areas: [
-    'Takoradi', 'Effia-Nkwanta', 'Kwesimintsim', 'Anaji', 'Airport Ridge',
+    'Apollo', 'Takoradi', 'Effia-Nkwanta', 'Kwesimintsim', 'Anaji', 'Airport Ridge',
     'Apremdo', 'Beach Road', 'Sekondi', 'Ketan', 'Essikado',
     'Tarkwa (larger jobs)', 'Other / ask us',
   ],
   timeSlots: ['08:00 - 10:00', '10:00 - 12:00', '12:00 - 14:00', '14:00 - 16:00', '16:00 - 18:00'],
 
   /* ------------------------------ services ------------------------------ */
-  /* These fill the enquiry form. Add, remove or rename freely —
-     the value must stay lowercase-with-dashes. */
+  /* Taken from the flyer's "Our Services" list, in the same order, followed
+     by the larger commercial and industrial work. Add, remove or rename
+     freely — the value must stay lowercase-with-dashes. */
   services: [
-    { value: 'laundry',              label: 'Laundry services',              hint: 'Washing, drying, ironing, folding & stain treatment' },
-    { value: 'deep-cleaning',        label: 'Deep cleaning',                 hint: 'Thorough top-to-bottom clean' },
+    { value: 'residential-cleaning', label: 'Residential cleaning',          hint: 'Homes, apartments & flats' },
+    { value: 'office-cleaning',      label: 'Office cleaning',               hint: 'Clean workspaces, higher productivity' },
+    { value: 'laundry',              label: 'Laundry services',              hint: 'Wash, dry & fold' },
+    { value: 'ironing',              label: 'Ironing services',              hint: 'Neat clothes, confident you' },
+    { value: 'deep-cleaning',        label: 'Deep cleaning',                 hint: 'For a healthier environment' },
+    { value: 'commercial-cleaning',  label: 'Commercial & retail cleaning',  hint: 'Shops, banks, schools, clinics' },
     { value: 'industrial-cleaning',  label: 'Industrial cleaning',           hint: 'Factories, warehouses, large premises' },
-    { value: 'commercial-cleaning',  label: 'Commercial cleaning',           hint: 'Offices, shops, banks, schools' },
     { value: 'hotel-cleaning',       label: 'Hotel & guesthouse cleaning',   hint: 'Rooms, linen, turnarounds' },
     { value: 'move-cleaning',        label: 'Move-in / move-out cleaning',   hint: 'Empty-property deep clean' },
     { value: 'post-event-cleaning',  label: 'Post-event cleaning',           hint: 'After parties, weddings, functions' },
@@ -60,14 +66,13 @@ window.SITE = {
 
   /* ----------------------------- who we serve ---------------------------- */
   /* The client groups the business targets. Shown as a section on the home
-     page and in the enquiry form. Available icons: office, hotel, factory,
-     school, home, event. */
+     page. Available icons: office, hotel, factory, school, home, event. */
   sectors: [
+    { icon: 'home',     title: 'Homes & residents',     text: 'Deep cleaning for houses, apartments and flats, move-in and move-out cleans, and household laundry collected and returned.' },
     { icon: 'office',   title: 'Offices & corporate',   text: 'Regular cleaning for offices, banks, shops and shared workspaces — scheduled around your working hours.' },
     { icon: 'hotel',    title: 'Hotels & guesthouses',  text: 'Guest rooms, bathrooms, lobbies and corridors, plus fast turnarounds between check-out and check-in.' },
     { icon: 'factory',  title: 'Industrial & commercial', text: 'Factories, warehouses, workshops and large premises, including floors and high-traffic areas.' },
     { icon: 'school',   title: 'Schools & institutions', text: 'Classrooms, clinics, churches and community buildings cleaned on a dependable schedule.' },
-    { icon: 'home',     title: 'Homes & residents',     text: 'Deep cleaning, move-in and move-out cleans, and household laundry collected and returned.' },
     { icon: 'event',    title: 'Events & functions',    text: 'Post-event cleaning after parties, weddings, conferences and funerals — we leave the venue ready.' },
   ],
 };
