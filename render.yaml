@@ -1,0 +1,36 @@
+# ---------------------------------------------------------------------------
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy: push this repo to GitHub, then in Render choose
+# "New +" -> "Blueprint" and pick the repo. Render reads this file.
+# ---------------------------------------------------------------------------
+
+services:
+  - type: web
+    name: freshfold-laundry
+    runtime: node
+    region: frankfurt      # closest Render region to Accra (lower latency than Oregon)
+    plan: free             # free tier sleeps after 15 min idle; upgrade for always-on
+    buildCommand: ""       # nothing to build — no dependencies
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: ADMIN_KEY
+        generateValue: true   # Render generates a strong key; copy it from the dashboard
+      - key: NODE_VERSION
+        value: "20"
+
+    # -----------------------------------------------------------------------
+    # IMPORTANT: the free plan has ephemeral storage, so bookings are wiped
+    # whenever the service restarts or redeploys.
+    #
+    # For a real business, upgrade to a paid instance and uncomment the block
+    # below, which keeps data/bookings.json on a persistent disk.
+    # -----------------------------------------------------------------------
+    # disk:
+    #   name: bookings-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # envVars:
+    #   - key: DATA_DIR
+    #     value: /var/data

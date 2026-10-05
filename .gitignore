@@ -1,0 +1,29 @@
+# Dependencies (this project has none, but keep it tidy for the future)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Secrets — never commit these
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Customer booking data: private, and it belongs on the server, not in git.
+# The folder is recreated automatically when the first booking arrives.
+data/bookings.json
+data/*.tmp
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# Deployment leftovers
+.vercel
+.netlify

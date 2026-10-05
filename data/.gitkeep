@@ -1,0 +1,6 @@
+Booking data folder.
+
+bookings.json is intentionally NOT tracked in git — it holds your customers'
+names, phone numbers and addresses, and it gets written by the server.
+
+It is created automatically the first time someone books through the website.
