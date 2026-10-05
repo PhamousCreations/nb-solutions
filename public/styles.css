@@ -785,3 +785,53 @@ fieldset { border: 0; padding: 0; margin: 0 0 1.3rem; }
   color: var(--brand);
   margin-bottom: 0.7rem;
 }
+
+/* ==========================================================================
+   Floating WhatsApp button — stays with the visitor as they scroll
+   ========================================================================== */
+.wa-float {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: 999px;
+  background: #25d366;
+  color: #06341a;                    /* dark text: white on green fails contrast */
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  box-shadow: 0 14px 32px rgba(6, 52, 26, 0.28), 0 3px 8px rgba(6, 52, 26, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  animation: wa-in 0.5s ease-out 0.6s both;
+}
+.wa-float svg { width: 24px; height: 24px; flex: none; }
+.wa-float:hover { background: #1eb455; transform: translateY(-3px); box-shadow: 0 18px 38px rgba(6, 52, 26, 0.34); }
+.wa-float:active { transform: translateY(-1px); }
+.wa-float:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; }
+
+@keyframes wa-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* keep the last of the content clear of the floating button on small screens */
+@media (max-width: 700px) {
+  body { padding-bottom: 84px; }
+  .wa-float { right: 14px; bottom: 14px; padding: 0.8rem 1rem; font-size: 0.9rem; }
+  .wa-float svg { width: 22px; height: 22px; }
+}
+@media (max-width: 380px) {
+  .wa-float span { display: none; }   /* icon only on very narrow phones */
+  .wa-float { padding: 0.85rem; border-radius: 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-float { animation: none; }
+}
+@media print {
+  .wa-float { display: none !important; }
+}
