@@ -11,11 +11,13 @@ COPY package.json ./
 COPY server.js ./
 COPY public ./public
 
-# Booking data lives outside the app folder so it can be mounted as a volume
+# Booking data lives outside the app folder so it can be mounted as a volume.
+# chown is essential: the container runs as the non-root "node" user, and without
+# it that user can't write to /data and bookings would silently fail.
 ENV NODE_ENV=production \
     DATA_DIR=/data \
     PORT=3000
-RUN mkdir -p /data
+RUN mkdir -p /data && chown node:node /data
 VOLUME ["/data"]
 
 EXPOSE 3000
