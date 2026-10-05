@@ -17,10 +17,11 @@ window.SITE = {
   phoneDisplay: '+233 59 613 4611',       // calls — from the flyer
   phoneRaw: '+233596134611',              // used for click-to-call, no spaces
 
-  // From the flyer. NOTE: you gave me a different number earlier
-  // (+233 55 396 5448) — please double-check which one is correct.
-  whatsapp: '233553865448',
-  whatsappDisplay: '+233 55 386 5448',
+  // Confirmed by the client as the correct number.
+  // IMPORTANT: the printed flyer shows 055 386 5448 — one digit out. The flyer
+  // needs correcting before it is reprinted and distributed.
+  whatsapp: '233553965448',
+  whatsappDisplay: '+233 55 396 5448',
   whatsappMessage: "Hello N&B Solutions, I'd like to enquire about your cleaning and laundry services.",
 
   // ADD YOUR EMAIL HERE when you have it. While this is empty, the email
@@ -32,9 +33,9 @@ window.SITE = {
   city: 'Takoradi',
   region: 'Western Region',
 
-  // PLACEHOLDER — confirm your real hours
-  hours: 'Monday to Saturday',
-  hoursSunday: 'Evening &amp; weekend work available for commercial clients',
+  // Confirmed opening hours
+  hours: 'Monday to Saturday, 7:00am – 8:00pm',
+  hoursSunday: 'Commercial & contract work can be arranged outside these hours',
 
   /* ------------------------- coverage & scheduling ----------------------- */
   /* PLACEHOLDER — trim this to the areas you actually cover.

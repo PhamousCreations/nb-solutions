@@ -54,6 +54,7 @@ these in their dashboard instead.
 | Founder | Benjamin Ansah |
 | Phone (calls) | +233 59 613 4611 |
 | WhatsApp | +233 55 396 5448 |
+| Opening hours | Monday to Saturday, 7:00am – 8:00pm |
 | Services (from the flyer) | Residential cleaning, office cleaning, laundry (wash/dry/fold), ironing, deep cleaning |
 | Also offered | Commercial & retail, industrial, hotel & guesthouse, move-in/move-out, post-event |
 | Promises | Reliable service · Affordable rates · Customer satisfaction |
@@ -64,13 +65,16 @@ these in their dashboard instead.
 
 - [ ] **Email address** — add it to `public/config.js` (`email: ''`) and the email row
       reappears automatically in the contact section and footer.
-- [ ] **Confirm the WhatsApp number.** The flyer says **055 386 5448**; your earlier
-      message said **055 396 5448**. The site currently uses the flyer's number. One digit
-      differs — if you sent a customer to the wrong one, you'd never hear from them. Tell
-      me which is right and I'll switch it in one place.
+- ⚠️ **THE FLYER HAS THE WRONG WHATSAPP NUMBER.** It prints **055 386 5448**; the
+      correct number is **055 396 5448**. The website uses the correct one. Fix this
+      before the flyer is reprinted or distributed, and tell anyone who already has a
+      copy — a wrong digit means customers message a stranger and you never hear from them.
+- [ ] **Opening hours confirmed** as Monday to Saturday, 7am – 8pm. Sunday and
+      after-hours work is described as available for commercial clients — change that
+      line in `config.js` if it isn't accurate.
 - [ ] **Full street address / P.O. Box** — currently reads "Apollo, Takoradi, Western
       Region, Ghana".
-- [ ] **Opening hours** — currently "Monday to Saturday".
+
 - [ ] **Confirm service areas** — the site lists Apollo, Takoradi and Western Region
       neighbourhoods (Effia-Nkwanta, Kwesimintsim, Anaji, Airport Ridge, Apremdo,
       Beach Road, Sekondi, Ketan, Essikado). Trim `areas` in `config.js` to what you
