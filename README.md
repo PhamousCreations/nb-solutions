@@ -23,6 +23,10 @@ PORT=8080 node server.js                 # run on a different port
 ADMIN_KEY=my-secret node server.js       # protect the staff dashboard
 ```
 
+Or keep them in a file — copy `.env.example` to `.env` and run
+`node --env-file=.env server.js` (needs Node 20.6+). Either way works; on a hosting
+platform you'll set these in their dashboard instead.
+
 Pages:
 
 | Page | What it does |
