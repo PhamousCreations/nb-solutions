@@ -29,7 +29,7 @@ window.SITE = {
 
   /* Your business email. Until you add one here, the email row hides itself
      everywhere on the site. Alerts already go to nbsolutions571@gmail.com. */
-  email: '',
+  email: 'nbsolutions571@gmail.com',
 
   address: 'Apollo, Takoradi, Western Region, Ghana',
   city: 'Takoradi',
