@@ -14,8 +14,9 @@
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
     );
 
-  function waLink(extra) {
-    const text = (extra ? extra + '\n\n' : '') + (S.whatsappMessage || '');
+  function waLink(extra, includeGreeting) {
+    const greeting = includeGreeting === false ? '' : S.whatsappMessage || '';
+    const text = (extra ? extra + (greeting ? '\n\n' : '') : '') + greeting;
     return 'https://wa.me/' + S.whatsapp + '?text=' + encodeURIComponent(text);
   }
 
@@ -28,6 +29,32 @@
     home:    '<path d="M3.5 11 12 4.5 20.5 11"/><path d="M5.5 12.5v8h13v-8"/><path d="M10 20.5v-5h4v5"/>',
     event:   '<path d="M8 3.5h8l-1.1 6.2a3 3 0 0 1-5.8 0z"/><path d="M12 12.7v6M9 20.5h6"/><path d="M5 5.5l3.4 1.2M19 5.5l-3.4 1.2"/>',
   };
+
+  /* ------------------------------- branding --------------------------------- */
+  /* The real logo lives in images/logo.png. If that file is missing, fall back
+     to the built-in SVG mark so the header never shows a broken image. */
+  function applyLogo() {
+    if (!S.logo) return;
+    $$('svg.brand-mark').forEach((svg) => {
+      const img = document.createElement('img');
+      img.src = S.logo;
+      img.width = 48;
+      img.height = 48;
+      img.className = svg.className.baseVal || 'brand-mark';
+      img.alt = svg.closest('.footer-brand') ? '' : (S.name || '') + ' logo';
+      img.addEventListener('error', () => { img.replaceWith(svg); });
+      svg.replaceWith(img);
+    });
+    // keep the favicon in step with the logo
+    const icon = document.querySelector('link[rel="icon"]');
+    if (icon && S.logo) {
+      const fav = document.querySelector('link[rel="icon"][data-fav]') || document.createElement('link');
+      fav.rel = 'icon';
+      fav.setAttribute('data-fav', '1');
+      fav.href = S.logo.replace(/logo\.png$/, 'favicon.png');
+      if (!fav.parentNode) document.head.appendChild(fav);
+    }
+  }
 
   /* ----------------------------- config injection ---------------------------- */
   function hydrate() {
@@ -172,6 +199,49 @@
       if (list.length) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    /* Turn the filled-in form into a readable WhatsApp message, so that if the
+       server is unreachable the enquiry can still reach the business instead of
+       being lost. */
+    function enquiryAsText(payload) {
+      const lines = ['Hello ' + (S.name || '') + ', I filled in your website form but it did not go through. Here are my details:'];
+      const add = (label, val) => { if (val) lines.push(label + ': ' + val); };
+      add('Service needed', String(payload.service).replace(/-/g, ' '));
+      add('Area', payload.area);
+      add('Address', payload.address);
+      add('Name', payload.name);
+      add('Phone', payload.phone);
+      add('Email', payload.email);
+      if (payload.pickupDate) add('Preferred date', payload.pickupDate + (payload.slot ? ' (' + payload.slot + ')' : ''));
+      add('How often', payload.frequency);
+      add('Details', payload.notes);
+      return lines.join('\n');
+    }
+
+    /* Shown only when the network or the server failed — NOT for validation
+       problems, which the visitor can fix themselves. */
+    function showFallback(payload) {
+      const box = $('#formErrors');
+      box.innerHTML = '';
+      box.hidden = true;
+      let panel = $('#fallbackPanel');
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'fallbackPanel';
+        panel.className = 'fallback';
+        form.parentNode.insertBefore(panel, form);
+      }
+      const waHref = waLink(enquiryAsText(payload), false);
+      panel.innerHTML =
+        '<h3>We couldn\'t send that automatically</h3>' +
+        '<p>Sorry — something went wrong at our end. <strong>Your details are still in the form below.</strong> ' +
+        'Tap the button and they\'ll be sent to us on WhatsApp instead, so nothing is lost.</p>' +
+        '<div class="hero-cta" style="margin:0">' +
+        '<a class="btn btn-wa" href="' + waHref + '" target="_blank" rel="noopener">Send my enquiry on WhatsApp</a>' +
+        '<a class="btn btn-ghost" data-site-href="phone" href="tel:' + (S.phoneRaw || '') + '">Or call us</a>' +
+        '</div>';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       showErrors([]);
@@ -198,8 +268,19 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error((data.errors || [data.error || 'Something went wrong.']).join(' '));
+        const data = await res.json().catch(() => ({}));
+
+        // 422 = something in the form needs fixing. Show those messages.
+        if (res.status === 422 && data.errors && data.errors.length) {
+          showErrors(data.errors);
+          return;
+        }
+        // Anything else that isn't a clean success = a real failure.
+        // Give the visitor a way to reach us rather than losing the enquiry.
+        if (!res.ok || !data.ok) {
+          showFallback(payload);
+          return;
+        }
         $('#bookingForm').hidden = true;
         const done = $('#success');
         done.hidden = false;
@@ -209,7 +290,7 @@
         );
         done.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err) {
-        showErrors([err.message + ' You can also reach us on WhatsApp.']);
+        showFallback(payload);
       } finally {
         btn.disabled = false;
         btn.textContent = label;
@@ -226,55 +307,100 @@
       bookings: [],
       filter: 'all',
       q: '',
+      showArchived: false,
+      confirmDelete: null,      // the ref awaiting a second click
+      error: '',
     };
     $('#adminKey').value = state.key;
 
+    const FINISHED = ['delivered', 'cancelled'];
     const badge = (s) => `<span class="badge badge-${esc(s)}">${esc(s).replace('-', ' ')}</span>`;
+    const liveList = () => state.bookings.filter((b) => !b.archived);
+    const finished = () => liveList().filter((b) => FINISHED.includes(b.status));
+
+    function card(b) {
+      const confirming = state.confirmDelete === b.ref;
+      return `<article class="booking-card${b.archived ? ' is-archived' : ''}">
+        <header>
+          <div><strong>${esc(b.ref)}</strong> ${badge(b.status)}${b.archived ? ' <span class="badge badge-archived">archived</span>' : ''}</div>
+          <time>${new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time>
+        </header>
+        <p class="bk-main">${esc(b.name)} · <a href="tel:${esc(String(b.phone).replace(/\s/g, ''))}">${esc(b.phone)}</a></p>
+        <p class="bk-sub">${esc(String(b.service).replace(/-/g, ' '))} · ${esc(b.area)}${b.pickupDate ? ' · ' + esc(b.pickupDate) : ''}${b.slot ? ' (' + esc(b.slot) + ')' : ''}${b.frequency ? ' · ' + esc(b.frequency) : ''}</p>
+        <p class="bk-sub">${esc(b.address)}</p>
+        ${b.email ? `<p class="bk-sub">✉ <a href="mailto:${esc(b.email)}">${esc(b.email)}</a></p>` : ''}
+        ${b.notes ? `<p class="bk-note">“${esc(b.notes)}”</p>` : ''}
+        <footer>
+          ${
+            confirming
+              ? `<div class="confirm-strip" role="alert">
+                   <span><strong>Delete ${esc(b.ref)}?</strong> ${esc(b.name)}’s enquiry will be removed from this dashboard and cannot be undone from here. A recovery copy is kept in <code>data/deleted-bookings.json</code>.</span>
+                   <button class="chip chip-danger-solid" data-confirm-delete="${esc(b.ref)}">Yes, delete it</button>
+                   <button class="chip" data-cancel-delete="1">Cancel</button>
+                 </div>`
+              : `${['new', 'confirmed', 'picked-up', 'delivered', 'cancelled']
+                  .filter((st) => st !== b.status)
+                  .map((st) => `<button class="chip" data-ref="${esc(b.ref)}" data-status="${esc(st)}">Mark ${esc(st).replace('-', ' ')}</button>`)
+                  .join('')}
+                 <button class="chip chip-wa" data-wa="${esc(String(b.phone).replace(/\D/g, ''))}" data-ref="${esc(b.ref)}">WhatsApp</button>
+                 <span class="chip-sep"></span>
+                 <button class="chip chip-archive" data-ref="${esc(b.ref)}" data-archived="${b.archived ? 'true' : 'false'}">
+                   ${b.archived ? 'Restore from archive' : 'Archive'}
+                 </button>
+                 <button class="chip chip-danger" data-ref="${esc(b.ref)}" data-delete="1">Delete</button>`
+          }
+        </footer>
+      </article>`;
+    }
 
     function render() {
-      const list = state.bookings.filter(
-        (b) =>
-          (state.filter === 'all' || b.status === state.filter) &&
-          (!state.q ||
-            [b.ref, b.name, b.phone, b.area, b.service].join(' ').toLowerCase().includes(state.q.toLowerCase()))
-      );
+      const archivedCount = state.bookings.filter((b) => b.archived).length;
+      const finishedCount = finished().length;
+
+      const list = state.bookings.filter((b) => {
+        if (b.archived && !state.showArchived) return false;
+        if (state.filter !== 'all' && b.status !== state.filter) return false;
+        if (!state.q) return true;
+        return [b.ref, b.name, b.phone, b.area, b.service].join(' ').toLowerCase().includes(state.q.toLowerCase());
+      });
+
+      // stats describe live work only — archived jobs are done with
       const stats = ['new', 'confirmed', 'picked-up', 'delivered'].map(
-        (s) => `<div class="stat"><span class="stat-num">${state.bookings.filter((b) => b.status === s).length}</span><span class="stat-label">${s.replace('-', ' ')}</span></div>`
+        (st) => `<div class="stat"><span class="stat-num">${liveList().filter((b) => b.status === st).length}</span><span class="stat-label">${st.replace('-', ' ')}</span></div>`
       );
       $('#adminStats').innerHTML = stats.join('');
+
       $('#adminCount').textContent = `${list.length} enquir${list.length === 1 ? 'y' : 'ies'}`;
+
+      const archToggle = $('#adminArchived');
+      if (archToggle) {
+        archToggle.textContent = `Show archived (${archivedCount})`;
+        archToggle.classList.toggle('is-active', state.showArchived);
+        archToggle.setAttribute('aria-pressed', state.showArchived ? 'true' : 'false');
+      }
+      const archFinished = $('#adminArchiveFinished');
+      if (archFinished) {
+        archFinished.hidden = finishedCount === 0;
+        archFinished.textContent = `Archive finished (${finishedCount})`;
+      }
+
       if (!list.length) {
-        $('#adminList').innerHTML = `<p class="empty">No enquiries here yet. New ones sent from the website will appear automatically.</p>`;
+        $('#adminList').innerHTML =
+          (state.error ? `<p class="empty empty-error">${esc(state.error)}</p>` : '') +
+          (state.bookings.length === 0
+            ? `<p class="empty">No enquiries yet. Anything sent from the website appears here straight away.</p>`
+            : `<p class="empty">Nothing matches this view.${state.showArchived ? '' : ' Finished jobs may be hidden — try <em>Show archived</em>.'}</p>`);
         return;
       }
-      $('#adminList').innerHTML = list
-        .map(
-          (b) => `<article class="booking-card">
-            <header>
-              <div><strong>${esc(b.ref)}</strong> ${badge(b.status)}</div>
-              <time>${new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time>
-            </header>
-            <p class="bk-main">${esc(b.name)} · <a href="tel:${esc(String(b.phone).replace(/\s/g, ''))}">${esc(b.phone)}</a></p>
-            <p class="bk-sub">${esc(String(b.service).replace(/-/g, ' '))} · ${esc(b.area)}${b.pickupDate ? ' · ' + esc(b.pickupDate) : ''}${b.slot ? ' (' + esc(b.slot) + ')' : ''}${b.frequency ? ' · ' + esc(b.frequency) : ''}</p>
-            <p class="bk-sub">${esc(b.address)}</p>
-            ${b.email ? `<p class="bk-sub">✉ <a href="mailto:${esc(b.email)}">${esc(b.email)}</a></p>` : ''}
-            ${b.notes ? `<p class="bk-note">“${esc(b.notes)}”</p>` : ''}
-            <footer>
-              ${['new', 'confirmed', 'picked-up', 'delivered', 'cancelled']
-                .filter((s) => s !== b.status)
-                .map((s) => `<button class="chip" data-ref="${esc(b.ref)}" data-status="${esc(s)}">Mark ${esc(s).replace('-', ' ')}</button>`)
-                .join('')}
-              <button class="chip chip-wa" data-wa="${esc(String(b.phone).replace(/\D/g, ''))}" data-ref="${esc(b.ref)}">WhatsApp</button>
-            </footer>
-          </article>`
-        )
-        .join('');
+      $('#adminList').innerHTML =
+        (state.error ? `<p class="empty empty-error">${esc(state.error)}</p>` : '') + list.map(card).join('');
     }
 
     async function load() {
       state.key = $('#adminKey').value.trim();
       localStorage.setItem('nb_key', state.key);
-      const res = await fetch('/api/bookings?key=' + encodeURIComponent(state.key));
+      // archived=all so the dashboard holds everything and can toggle the view itself
+      const res = await fetch('/api/bookings?archived=all&key=' + encodeURIComponent(state.key));
       if (res.status === 401) {
         $('#adminList').innerHTML = `<p class="empty">That admin key wasn’t accepted. The default is <code>nb-solutions-admin</code> — change it with the ADMIN_KEY environment variable.</p>`;
         $('#adminStats').innerHTML = '';
@@ -282,6 +408,7 @@
       }
       const data = await res.json();
       state.bookings = data.bookings || [];
+      state.error = '';
       render();
     }
 
@@ -292,14 +419,102 @@
     });
     $$('.filters .chip').forEach((btn) =>
       btn.addEventListener('click', () => {
+        if (!btn.dataset.filter) return;          // the toggle and bulk buttons handle themselves
         state.filter = btn.dataset.filter;
         $$('.filters .chip').forEach((b) => b.classList.toggle('is-active', b === btn));
         render();
       })
     );
+    $('#adminArchived').addEventListener('click', () => {
+      state.showArchived = !state.showArchived;
+      state.confirmDelete = null;
+      render();
+    });
+    $('#adminArchiveFinished').addEventListener('click', async () => {
+      const targets = finished();
+      if (!targets.length) return;
+      const btn = $('#adminArchiveFinished');
+      btn.disabled = true;
+      btn.textContent = 'Archiving…';
+      for (const b of targets) {
+        await fetch(`/api/bookings/${encodeURIComponent(b.ref)}/archive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: state.key, archived: true }),
+        });
+      }
+      btn.disabled = false;
+      await load();
+    });
+
+    // Escape backs out of a delete confirmation, so a mis-click is never fatal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && state.confirmDelete) {
+        state.confirmDelete = null;
+        render();
+      }
+    });
+
     $('#adminList').addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
+
+      if (btn.dataset.cancelDelete) {
+        state.confirmDelete = null;
+        render();
+        return;
+      }
+
+      // first click just arms the confirmation
+      if (btn.dataset.delete) {
+        state.confirmDelete = btn.dataset.ref;
+        state.error = '';
+        render();
+        const strip = $('#adminList').querySelector('.confirm-strip');
+        if (strip) strip.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+
+      // second, explicit click does the deleting
+      if (btn.dataset.confirmDelete) {
+        const ref = btn.dataset.confirmDelete;
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
+        let res;
+        try {
+          res = await fetch('/api/bookings/' + encodeURIComponent(ref), {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: state.key }),
+          });
+        } catch (err) {
+          state.error = 'Could not reach the server, so nothing was deleted.';
+          state.confirmDelete = null;
+          render();
+          return;
+        }
+        state.confirmDelete = null;
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          state.error = data.error || 'That enquiry could not be deleted.';
+          render();
+          return;
+        }
+        await load();
+        return;
+      }
+
+      if (btn.dataset.archived) {
+        btn.disabled = true;
+        await fetch(`/api/bookings/${encodeURIComponent(btn.dataset.ref)}/archive`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: state.key, archived: btn.dataset.archived !== 'true' }),
+        });
+        await load();
+        return;
+      }
+
       if (btn.dataset.wa) {
         window.open(
           'https://wa.me/' + btn.dataset.wa + '?text=' +
@@ -308,6 +523,7 @@
         );
         return;
       }
+
       if (!btn.dataset.status) return;
       btn.disabled = true;
       await fetch(`/api/bookings/${encodeURIComponent(btn.dataset.ref)}/status`, {
@@ -323,6 +539,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     hydrate();
+    applyLogo();
     chrome();
     renderSectors();
     initEnquiry();

@@ -5,20 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Staff dashboard — %SITE%</title>
 <meta name="robots" content="noindex" />
-<meta name="theme-color" content="#16294a" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2316294a'/%3E%3Cpath d='M8 16.5 16 10l8 6.5' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 16.5V22h10v-5.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M8.5 26c3-1.8 5-1.8 7.5 0s4.5 1.8 7.5 0' fill='none' stroke='%237ac142' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+<meta name="theme-color" content="#0b2a52" />
+<link rel="icon" href="images/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html">
-      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
-        <rect width="48" height="48" rx="12" fill="#16294a" />
-        <path d="M11 24.5 24 14.5l13 10" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M16 24.5V34h16v-9.5" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M12 39.5c4-2.4 7.3-2.4 11 0s7 2.4 11 0" fill="none" stroke="#7ac142" stroke-width="3.2" stroke-linecap="round" />
-      </svg>
+      <img class="brand-mark" src="images/logo.png" width="48" height="48" alt="N&amp;B Solutions logo" />
       <span>
         <span class="brand-name" data-site="name">N&amp;B Solutions</span>
         <span class="brand-sub">Staff dashboard</span>
@@ -26,6 +21,7 @@
     </a>
     <nav class="site-nav" aria-label="Main" style="position:static;display:flex">
       <a href="index.html">View website</a>
+      <a href="about.html">About page</a>
       <a href="contact.html">New enquiry</a>
     </nav>
   </div>
@@ -63,15 +59,28 @@
         <button class="chip" data-filter="picked-up">Picked up</button>
         <button class="chip" data-filter="delivered">Delivered</button>
         <button class="chip" data-filter="cancelled">Cancelled</button>
-        <span class="chip" style="border-style:dashed;cursor:default" id="adminCount">0 bookings</span>
+        <span class="chip" style="border-style:dashed;cursor:default" id="adminCount">0 enquiries</span>
+        <button class="chip chip-archive" id="adminArchiveFinished" hidden>Archive finished (0)</button>
+        <button class="chip" id="adminArchived" aria-pressed="false">Show archived (0)</button>
       </div>
 
       <div id="adminList"></div>
 
-      <p class="fineprint" style="margin-top:2rem">
-        Change the admin key by starting the server with <code>ADMIN_KEY=yourkey node server.js</code>.
-        Enquiries are saved in <code>data/bookings.json</code> — back that file up, and keep this page unlisted.
-      </p>
+      <div class="howto" style="margin-top:2rem">
+        <h3>Archive or delete?</h3>
+        <ul>
+          <li><strong>Archive</strong> hides a finished job from the list but keeps every detail. Tick
+            <em>Show archived</em> to see them again, or press <em>Restore from archive</em> to put one back.
+            Nothing is lost — use this for anything you are done with.</li>
+          <li><strong>Delete</strong> removes an enquiry for good, and always asks you to confirm first.
+            A recovery copy is kept in <code>data/deleted-bookings.json</code> in case you delete the wrong one.</li>
+          <li><strong>Archive finished</strong> archives every delivered and cancelled job in one go.</li>
+        </ul>
+        <p class="fineprint">
+          Change the admin key by starting the server with <code>ADMIN_KEY=yourkey node server.js</code>.
+          Enquiries are saved in <code>data/bookings.json</code> — back that file up, and keep this page unlisted.
+        </p>
+      </div>
     </div>
   </section>
 </main>

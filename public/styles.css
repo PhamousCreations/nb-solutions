@@ -4,36 +4,38 @@
    ========================================================================== */
 
 :root {
-  /* Brand palette, taken from the company flyer: navy + green */
-  --cream: #f8fbf4;        /* page background      */
-  --cream-2: #eef6e6;      /* tinted sections      */
-  --sand: #e0f0d0;         /* soft green wash      */
-  --ink: #16294a;          /* headlines (navy)     */
-  --body: #4b5a72;
-  --muted: #79879b;
+  /* Brand palette sampled directly from the N&B Solutions logo */
+  --cream: #f6f9fc;        /* page background        */
+  --cream-2: #eef4f9;      /* tinted sections        */
+  --sand: #dbe8f5;         /* soft blue wash         */
+  --ink: #0b2a52;          /* headlines (deep navy)  */
+  --body: #4a5b70;
+  --muted: #77879a;
 
-  --brand: #7ac142;        /* primary green        */
-  --brand-dark: #5b9e2b;
-  --brand-soft: #edf7e3;
-  --brand-tint: #dcefc3;
+  --brand: #53a921;        /* logo green - icons, accents, decoration only */
+  --brand-dark: #3f7a12;   /* deep green - buttons with white text (5.2:1)  */
+  --brand-soft: #eef7e6;
+  --brand-tint: #d7ecc4;
 
-  --navy: #1b4b8f;         /* secondary accent     */
-  --navy-dark: #12386e;
-  --navy-soft: #e6edf8;
+  --navy: #014795;         /* logo blue - secondary buttons, accents (9:1)  */
+  --navy-dark: #013a7a;
+  --navy-soft: #e6eef9;
 
-  --danger: #d9483b;       /* errors only          */
+  --sky: #0376e1;          /* logo bright blue - decorative only    */
+  --sun: #a8e063;          /* light green, for text on dark panels  */
+
+  --danger: #d9483b;       /* errors only                           */
   --danger-dark: #b8362a;
   --danger-soft: #fdeceb;
 
-  --sun: #a9d94f;          /* highlight / sparkle  */
   --white: #ffffff;
-  --line: #e2ecdb;
+  --line: #e2eaf2;
   --radius-lg: 28px;
   --radius: 20px;
   --radius-sm: 12px;
-  --shadow-sm: 0 6px 18px rgba(22, 41, 74, 0.06);
-  --shadow: 0 18px 45px rgba(22, 41, 74, 0.1);
-  --shadow-lg: 0 30px 70px rgba(22, 41, 74, 0.14);
+  --shadow-sm: 0 6px 18px rgba(11, 42, 82, 0.06);
+  --shadow: 0 18px 45px rgba(11, 42, 82, 0.1);
+  --shadow-lg: 0 30px 70px rgba(11, 42, 82, 0.14);
   --sans: 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
   --maxw: 1140px;
 }
@@ -107,9 +109,9 @@ code { background: var(--cream-2); padding: 2px 7px; border-radius: 7px; font-si
 .btn:hover { transform: translateY(-2px); }
 .btn:active { transform: translateY(0); }
 .btn:disabled { opacity: 0.6; cursor: progress; transform: none; }
-.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 12px 26px rgba(122, 193, 66, 0.32); }
+.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 12px 26px rgba(63, 122, 18, 0.30); }
 .btn-primary:hover { background: var(--brand-dark); }
-.btn-navy { background: var(--navy); color: #fff; box-shadow: 0 12px 26px rgba(27, 75, 143, 0.32); }
+.btn-navy { background: var(--navy); color: #fff; box-shadow: 0 12px 26px rgba(1, 71, 149, 0.30); }
 .btn-navy:hover { background: var(--navy-dark); }
 .btn-ghost { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
 .btn-ghost:hover { box-shadow: inset 0 0 0 2px var(--brand); color: var(--brand-dark); }
@@ -835,3 +837,214 @@ fieldset { border: 0; padding: 0; margin: 0 0 1.3rem; }
 @media print {
   .wa-float { display: none !important; }
 }
+
+/* ---------------------- enquiry fallback (server unreachable) ---------------------- */
+.fallback {
+  background: #fff8e6;
+  border: 1.5px solid #f0dca8;
+  border-left: 5px solid var(--sun);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+.fallback h3 { margin-bottom: 0.4em; font-size: 1.1rem; }
+.fallback p { font-size: 0.96rem; margin-bottom: 1rem; }
+
+/* ==========================================================================
+   About page: founder profile, timeline, expertise chips
+   ========================================================================== */
+
+.brand-mark { border-radius: 50%; }
+.brand-mark--footer { background: #fff; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: clamp(1.6rem, 4vw, 3rem);
+  align-items: start;
+}
+@media (max-width: 900px) { .profile-grid { grid-template-columns: 1fr; } }
+
+.profile-photo {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  background: var(--cream-2);
+}
+
+.founder-role {
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-dark);
+  margin-bottom: 0;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+}
+.chip-list li {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  border: 1px solid var(--brand-tint);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.timeline-heading {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 1.2rem;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--line);
+}
+.timeline li {
+  position: relative;
+  padding-left: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+.timeline li:last-child { margin-bottom: 0; }
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3.5px solid var(--brand);
+}
+.timeline--blue li::before { border-color: var(--navy); }
+
+.timeline .when {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brand-dark);
+  margin-bottom: 0.2rem;
+}
+.timeline--blue .when { color: var(--navy); }
+.timeline h4 {
+  margin: 0 0 0.25rem;
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+.timeline p {
+  margin: 0;
+  font-size: 0.94rem;
+}
+
+/* ------------------- founder card on the home page (links to About) ------------------- */
+.founder--link {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.founder--link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--brand);
+}
+.founder-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 22%;
+  flex: none;
+  border: 3px solid var(--brand-soft);
+}
+.founder--link .founder-more {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+.founder--link:hover .founder-more { text-decoration: underline; }
+
+/* ==========================================================================
+   Dashboard: archive, delete and the confirmation step
+   ========================================================================== */
+
+.chip:disabled { opacity: 0.55; cursor: progress; }
+
+.chip-archive { color: var(--navy); border-color: #bcd4f0; }
+.chip-archive:hover { border-color: var(--navy); color: var(--navy-dark); }
+
+.chip-danger { color: var(--danger); border-color: #f0c6c1; }
+.chip-danger:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger-dark); }
+
+.chip-danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; font-weight: 700; }
+.chip-danger-solid:hover { background: var(--danger-dark); border-color: var(--danger-dark); color: #fff; }
+
+/* pushes the destructive pair away from the everyday buttons */
+.chip-sep { flex: 1 1 auto; min-width: 0.4rem; }
+
+.confirm-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  background: var(--danger-soft);
+  border: 1.5px solid #f0c6c1;
+  border-radius: 14px;
+  padding: 0.75rem 0.95rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.confirm-strip > span { flex: 1 1 260px; }
+.confirm-strip code { font-size: 0.85em; }
+
+.booking-card.is-archived { background: var(--cream-2); opacity: 0.78; }
+.booking-card.is-archived .bk-main { font-weight: 600; }
+.badge-archived { background: #e8eef4; color: #5b6b7c; }
+
+.empty-error { border-color: #f0c6c1; background: var(--danger-soft); color: var(--danger-dark); }
+
+.howto {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.6rem;
+  box-shadow: var(--shadow-sm);
+}
+.howto h3 { margin-bottom: 0.6rem; font-size: 1rem; color: var(--ink); }
+.howto ul { margin: 0 0 1rem; padding-left: 1.2rem; color: var(--body); font-size: 0.94rem; }
+.howto li { margin-bottom: 0.5rem; }
+.howto .fineprint { margin: 0; }
