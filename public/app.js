@@ -402,7 +402,7 @@
       // archived=all so the dashboard holds everything and can toggle the view itself
       const res = await fetch('/api/bookings?archived=all&key=' + encodeURIComponent(state.key));
       if (res.status === 401) {
-        $('#adminList').innerHTML = `<p class="empty">That admin key wasn’t accepted. The default is <code>nb-solutions-admin</code> — change it with the ADMIN_KEY environment variable.</p>`;
+        $('#adminList').innerHTML = `<p class="empty">That admin key wasn’t accepted.</p>`;
         $('#adminStats').innerHTML = '';
         return;
       }
