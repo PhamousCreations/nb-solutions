@@ -120,7 +120,7 @@ Render redeploys automatically within a minute. That's the workflow from now on:
 
 - [ ] `ADMIN_KEY` changed to something strong (Render's generated one is good)
 - [ ] Real details in `public/config.js`
-- [ ] Sample enquiries cleared (open `/admin`, or delete `data/bookings.json` on the server)
+- [ ] Sample enquiries cleared (use the **Delete** button in `/admin`, or empty `data/bookings.json` on the server)
 - [ ] Test a real enquiry: submit the form, confirm it appears in `/admin`
 - [ ] Check the WhatsApp button opens *your* chat with the message pre-filled
 - [ ] Visit the site on your phone — most of your customers will be on mobile
@@ -148,3 +148,9 @@ To roll back, Render keeps your deploy history — pick an earlier one and hit *
 `data/bookings.json` is the only file with irreplaceable data in it. Download it from the
 dashboard occasionally (Render → Shell → `cat /var/data/bookings.json`), or ask me to add
 an "Export CSV" button to the staff dashboard.
+
+`data/deleted-bookings.json` is the safety net: any enquiry you delete in the dashboard is
+copied here first, with a `deletedAt` timestamp, so a wrong click is recoverable. It grows
+slowly and holds no more than the enquiries you deliberately deleted. Archives are not a
+separate file — an archived job stays in `bookings.json` with an `archived` flag, so
+backing up that one file backs up everything, archived jobs included.

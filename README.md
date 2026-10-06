@@ -36,6 +36,7 @@ these in their dashboard instead.
 | Page | What it does |
 |---|---|
 | `/` | Home — company profile, services, who we serve, how we work, FAQ, contact |
+| `/about` (`about.html`) | About us — the founder's profile, education, career and leadership |
 | `/contact` (`contact.html`) | Contact form — the main call to action on every page |
 | `/admin` (`admin.html`) | Staff dashboard — manage incoming enquiries |
 | `/api/health` | Quick check that the server is alive |
@@ -51,11 +52,12 @@ these in their dashboard instead.
 | Company name | N&B Solutions (registered in Ghana) |
 | Based in | **Apollo, Takoradi**, Western Region |
 | Tagline | Clean spaces · Fresh clothes · Better living |
-| Founder | Benjamin Ansah |
 | Phone (calls) | +233 59 613 4611 |
 | WhatsApp | +233 55 396 5448 |
 | Opening hours | Monday to Saturday, 7:00am – 8:00pm |
-| Services (from the flyer) | Residential cleaning, office cleaning, laundry (wash/dry/fold), ironing, deep cleaning |
+| Founder | **Benjamin Ansah** — C.E.O, Diploma in Electrical Engineering (TTU), former Operations Manager at GreenPro Commercial Ghana, 10+ years in the industry |
+| Founded | 2025 |
+| Services (from the flyer) | Residential cleaning, office cleaning, laundry (wash/dry/fold), ironing, deep cleaning, **fumigation & pest control** |
 | Also offered | Commercial & retail, industrial, hotel & guesthouse, move-in/move-out, post-event |
 | Promises | Reliable service · Affordable rates · Customer satisfaction |
 | Vision / mission | On the About section of the home page |
@@ -107,7 +109,7 @@ window.SITE = {
   phoneDisplay: '+233 59 613 4611',   // shown to customers
   phoneRaw: '+233596134611',          // used for click-to-call
   whatsapp: '233553965448',           // country code, no + or spaces
-  email: 'nbsolutions571@gmail.com',                          // add it here when you have one
+  email: '',                          // add it here when you have one
   ...
 };
 ```
@@ -128,15 +130,26 @@ later, say the word and I'll add a rate card back.
 The site's colours are taken from your flyer, so the website, the flyer, the logo and any
 signage or uniforms all match:
 
-| Token | Colour | Used for |
-|---|---|---|
-| `--ink` | Navy `#16294a` | Headlines, logo square, footer |
-| `--brand` | Green `#7ac142` | Buttons, icons, the wave in the logo |
-| `--navy` | Blue `#1b4b8f` | Secondary accents |
-| `--danger` | Red `#d9483b` | Form errors only |
+Colours are sampled directly from the official logo, so the site, logo, flyer, uniforms
+and signage all match:
 
-The logo in the header and footer is an SVG version of your flyer's house-and-wave mark.
-It's inline in each HTML file (search for `brand-mark`), so it needs no image file.
+| Token | Colour | Used for | White-text contrast |
+|---|---|---|---|
+| `--ink` | Deep navy `#0b2a52` | Headlines, footer | 14.6:1 |
+| `--navy` | Logo blue `#014795` | Secondary buttons, accents | 9.0:1 |
+| `--brand` | Logo green `#53a921` | Icons, accents, decoration | (not used behind text) |
+| `--brand-dark` | Deep green `#3f7a12` | Primary buttons | 5.2:1 |
+| `--sky` | Bright blue `#0376e1` | Decorative accents only | (not used behind text) |
+| `--danger` | Red `#d9483b` | Form errors only | — |
+
+**Why two greens:** the logo green `#53a921` only reaches 2.97:1 against white text, which
+fails accessibility standards and is genuinely hard to read. Buttons therefore use the
+deeper `#3f7a12` (5.2:1), while the logo green stays for icons and decoration where no
+text sits on top.
+
+**The logo** is `public/images/logo.png` — your official badge, cropped to a circle with
+transparent corners, plus `favicon.png` for the browser tab. To update it, replace those
+two files; no code changes needed.
 
 **Wording taken from the flyer:** the tagline *"Clean spaces · Fresh clothes · Better
 living"*, the closing line *"Clean today, fresh tomorrow."*, the five headline services,
@@ -150,8 +163,16 @@ same filename — no code changes needed.
 
 | File | Used for | Status |
 |---|---|---|
-| `team-cleaning.jpg` | Photo band under the hero: "Our team at work" | ✅ In use |
-| `cleaning-supplies.jpg` | Photo band under the hero: "We arrive with our own equipment" | ✅ In use |
+| `logo.png` | Header, footer, dashboard — the official badge | ✅ In use |
+| `favicon.png` | Browser tab icon | ✅ In use |
+| `founder.jpg` | Photo of Benjamin Ansah on the About page and the home page card | ✅ In use |
+| `cleaning-in-progress.jpg` | Photo band under the hero | ✅ In use |
+| `field-work.jpg` | Held in reserve — replaced in the hero band | ⏸ Not used |
+| `fumigation-spray.jpg` | Fumigation section + hero photo band | ✅ In use |
+| `fumigation-fogging.jpg` | Fumigation section | ✅ In use |
+
+**The two stock photographs are gone** — replaced with your own. That's a real upgrade:
+the site now shows your actual team and your actual work.
 
 ### A note on the images you sent
 
@@ -181,6 +202,75 @@ safe to use — but two honest points:
 branded shirts, before/after pairs of a room or an office, your equipment and van, a
 hotel or office you've cleaned (with the client's permission), and your founder.
 
+## Getting told when an enquiry arrives
+
+**Out of the box, nothing alerts you.** An enquiry is saved on the server and waits in
+the `/admin` dashboard until you go and look. Fine for testing; risky for a real business,
+because an enquiry can sit unseen for days.
+
+Turn on **email alerts** and every enquiry is emailed to you within seconds, with the
+customer's details and one-tap links to call them or reply on WhatsApp.
+
+### Check it before you rely on it
+
+Run this after setting the four values. It verifies the key, lists your confirmed
+senders, checks the provider will accept mail from where you're running, and sends one
+test email:
+
+```bash
+node --env-file=.env check-email-setup.js
+```
+
+It explains exactly what to fix when something is wrong, and it never sends a test
+unless everything before it passed.
+
+### Setup (about 10 minutes, free)
+
+1. Create a free account at [brevo.com](https://www.brevo.com) - 300 emails a day, no card.
+2. **Settings -> Senders & IPs -> Add a sender.** Enter the email address you want alerts to
+   come from (your own address is fine). Brevo emails you a confirmation link - click it.
+3. **Settings -> SMTP & API -> API Keys -> Create a new API key.** Copy it.
+4. Set these four values where the site runs (in `.env` locally, or your host's environment
+   settings):
+
+   ```
+   NOTIFY_PROVIDER=brevo
+   NOTIFY_API_KEY=xkeysib-...      <- the key from step 3
+   NOTIFY_FROM=you@example.com     <- the address you verified in step 2
+   NOTIFY_TO=you@example.com       <- where alerts should arrive
+   ```
+
+   `NOTIFY_TO` can list several addresses separated by commas, so a manager can see them too.
+5. **Turn off Brevo's "Authorised IPs" restriction** - see the warning below. This one
+   catches almost everybody, and it will silently block every alert if you skip it.
+
+**Your normal email address is enough.** Brevo verifies a single address, so a Gmail account
+works - you don't need a domain or a website email to start. You can add
+`info@nbsolutions.gh` later when you want it.
+
+### Turn off Brevo's "Authorised IPs" setting
+
+Brevo blocks API calls from IP addresses it doesn't recognise. Your website runs on
+hosting that **changes IP address on every deploy**, so allow-listing one address does
+not hold - alerts would work one day and fail the next, with no obvious cause.
+
+**Fix:** go to app.brevo.com/security/authorised_ips and turn the restriction **off**.
+
+Your API key is not the problem and does not need replacing. If alerts ever stop, run
+`check-email-setup.js` - it will tell you if this is the cause.
+
+### How it behaves
+
+- **Email problems can never cost you an enquiry.** If the provider rejects the mail, the
+  enquiry is still saved, the customer still sees their confirmation, and the server log
+  shows what went wrong.
+- Not configured at all? The log says `[notify] not configured` and the site carries on.
+- The alert includes a call link and a WhatsApp link built from the customer's number, so
+  you can reply in one tap from your phone.
+
+Want SMS as well as email? The same pattern works with a provider like Hubtel or Twilio -
+ask and I'll add it.
+
 ## How enquiries work
 
 1. A visitor fills in `/contact` — service needed, where they are, how to reach them,
@@ -189,7 +279,8 @@ hotel or office you've cleaned (with the client's permission), and your founder.
 2. It POSTs to `/api/bookings`, which validates it and saves it to `data/bookings.json`
    with a reference like `NB-261005-AK41`.
 3. They see a confirmation with their reference and a one-tap "Send it on WhatsApp too"
-   button.
+   button. If the server is unreachable, the page instead offers a WhatsApp button
+   pre-filled with everything they typed, so the enquiry still reaches you.
 4. You open `/admin` and move the enquiry through:
    **new → confirmed → picked up → delivered** (or cancelled). You can WhatsApp the
    customer straight from the dashboard.
@@ -197,10 +288,14 @@ hotel or office you've cleaned (with the client's permission), and your founder.
 ### API reference
 
 ```
-POST /api/bookings                  create a request (public)
-GET  /api/bookings?key=<ADMIN_KEY>  list requests
-POST /api/bookings/:ref/status      { "key": "...", "status": "confirmed" }
-GET  /api/health
+POST   /api/bookings                        create a request (public)
+GET    /api/bookings?key=<ADMIN_KEY>        list requests (archived ones are left out)
+GET    /api/bookings?archived=true          archived only
+GET    /api/bookings?archived=all           everything, archived included
+POST   /api/bookings/:ref/status            { "key": "...", "status": "confirmed" }
+POST   /api/bookings/:ref/archive           { "key": "...", "archived": true|false }
+DELETE /api/bookings/:ref                   { "key": "..." } — permanent, see below
+GET    /api/health
 ```
 
 ### Staff dashboard
@@ -211,13 +306,41 @@ Default key: `nb-solutions-admin` — **change this before going live**:
 ADMIN_KEY=a-long-random-password node server.js
 ```
 
-`data/bookings.json` ships with five sample enquiries (a hotel, an industrial site, a
-home deep clean and two laundry jobs) so the dashboard isn't empty when you first look. Delete them when you're ready for real data (keep the
-`{"bookings": []}` structure).
+**The download ships with an empty dashboard** (`{"bookings": []}`), so your live site
+starts clean with no sample data mixed in with real enquiries. The copy running on your
+own machine still has the sample enquiries in it, which is handy for trying things out.
 
-That file is in `.gitignore` on purpose: it holds customer names, phone numbers and
-addresses, so it never leaves your server. Your deployed site starts with an empty
+To clear sample enquiries from your own machine, use the **Delete** button in the
+dashboard (see below).
+
+`data/bookings.json` is in `.gitignore` on purpose: it holds customer names, phone numbers
+and addresses, so it never leaves your server. Your deployed site starts with an empty
 dashboard, which is exactly what you want.
+
+### Archiving and deleting enquiries
+
+A finished job never has to sit in the main list forever, and nothing has to be lost
+either. Both controls are on every enquiry card in the dashboard:
+
+| Action | What happens | Reversible? |
+|---|---|---|
+| **Archive** | Disappears from the list and out of the counts, but every detail is kept in `data/bookings.json`. Tick **Show archived (n)** to see them, **Restore from archive** to bring one back. | Yes, any time |
+| **Archive finished (n)** | Archives every *delivered* and *cancelled* job in one go. | Yes |
+| **Delete** | Removes the enquiry from the dashboard **after you confirm it**. | Only from the recovery file, by hand |
+
+**Delete always takes two clicks.** The first turns the card's buttons into a red
+confirmation strip naming the customer; nothing is sent to the server. You then press
+*Yes, delete it* to go ahead, or *Cancel* (or press <kbd>Esc</kbd>) to back out. That way
+a mis-click on a phone can't destroy a real enquiry.
+
+**Deleting still leaves a copy.** Before an enquiry is removed, the whole record is
+appended to `data/deleted-bookings.json` with a `deletedAt` timestamp. If you delete the
+wrong one, open that file and copy the record back into `data/bookings.json`. Like
+`bookings.json`, it is gitignored and excluded from Docker builds — customer details never
+leave your server.
+
+If a delete fails — no connection, or the server returns an error — the dashboard says so
+and the enquiry stays in the list. It never reports success it did not get.
 
 ---
 

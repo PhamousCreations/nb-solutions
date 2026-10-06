@@ -23,6 +23,23 @@ const DATA_FILE = process.env.DATA_DIR
   : path.join(__dirname, 'data', 'bookings.json');
 const ADMIN_KEY = process.env.ADMIN_KEY || 'nb-solutions-admin';
 
+/* ------------------------- email notifications -------------------------
+ * Optional. When configured, every new enquiry is emailed to the business
+ * straight away. Left unset, the site still works exactly as before and
+ * enquiries simply wait in the dashboard.
+ *
+ *   NOTIFY_PROVIDER = brevo | resend
+ *   NOTIFY_API_KEY  = provider API key
+ *   NOTIFY_FROM     = verified sender address
+ *   NOTIFY_TO       = where enquiries should land (can be a comma list)
+ * --------------------------------------------------------------------- */
+const NOTIFY = {
+  provider: (process.env.NOTIFY_PROVIDER || '').toLowerCase(),
+  apiKey: process.env.NOTIFY_API_KEY || '',
+  from: process.env.NOTIFY_FROM || '',
+  to: process.env.NOTIFY_TO || '',
+};
+
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -44,6 +61,26 @@ const STATUSES = ['new', 'confirmed', 'picked-up', 'delivered', 'cancelled'];
 const SERVICE_RE = /^[a-z][a-z0-9-]{2,40}$/;
 
 /* ---------------------------------- data ---------------------------------- */
+
+/* Anything deleted from the dashboard is kept here first, so a mistaken click
+   never destroys a real customer's details. Not shown in the dashboard. */
+const DELETED_FILE = path.join(path.dirname(DATA_FILE), 'deleted-bookings.json');
+
+function appendDeleted(record) {
+  try {
+    let list = [];
+    try {
+      const parsed = JSON.parse(fs.readFileSync(DELETED_FILE, 'utf8'));
+      list = Array.isArray(parsed) ? parsed : parsed.bookings || [];
+    } catch (err) {
+      list = [];                       // first deletion, or an unreadable file
+    }
+    list.unshift({ ...record, deletedAt: new Date().toISOString() });
+    fs.writeFileSync(DELETED_FILE, JSON.stringify({ bookings: list }, null, 2));
+  } catch (err) {
+    console.warn('[delete] could not write the recovery copy:', err.message);
+  }
+}
 
 function readBookings() {
   try {
@@ -70,6 +107,81 @@ function makeRef() {
     String(d.getDate()).padStart(2, '0');
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `NB-${stamp}-${rand}`;
+}
+
+/* ------------------------------- notifying -------------------------------- */
+
+const label = (v) => String(v || '').replace(/-/g, ' ');
+
+function enquiryEmail(record) {
+  const subject = `New enquiry ${record.ref} — ${label(record.service)} in ${record.area}`;
+  const lines = [
+    `New enquiry from the N&B Solutions website.`,
+    ``,
+    `Reference:   ${record.ref}`,
+    `Received:    ${new Date(record.createdAt).toLocaleString('en-GB')}`,
+    ``,
+    `Service:     ${label(record.service)}`,
+    `Area:        ${record.area}`,
+    `Address:     ${record.address}`,
+    ``,
+    `Name:        ${record.name}`,
+    `Phone:       ${record.phone}`,
+    record.email ? `Email:       ${record.email}` : null,
+    record.pickupDate ? `Preferred:   ${record.pickupDate}${record.slot ? ' (' + record.slot + ')' : ''}` : 'Preferred:   not given',
+    record.frequency ? `Frequency:   ${record.frequency}` : null,
+    ``,
+    record.notes ? `Their message:\n${record.notes}` : 'They did not add a message.',
+    ``,
+    `---`,
+    `Reply by phone:     tel:${String(record.phone).replace(/\s/g, '')}`,
+    `Reply on WhatsApp:  https://wa.me/${String(record.phone).replace(/\D/g, '').replace(/^0/, '233')}`,
+    `Open the dashboard: /admin`,
+  ];
+  // drop only the lines skipped above; keep the blank lines that group the text
+  return { subject, text: lines.filter((l) => l !== null).join('\n') };
+}
+
+/* Fire and forget. A failure here must never affect the visitor's submission,
+   so every error is caught and only logged. */
+async function notifyByEmail(record) {
+  if (!NOTIFY.provider || !NOTIFY.apiKey || !NOTIFY.from || !NOTIFY.to) {
+    console.log('[notify] not configured — enquiry is in the dashboard only (see .env.example)');
+    return;
+  }
+  const { subject, text } = enquiryEmail(record);
+  const recipients = NOTIFY.to.split(',').map((a) => a.trim()).filter(Boolean);
+
+  let url, headers, body;
+  try {
+    if (NOTIFY.provider === 'brevo') {
+      url = 'https://api.brevo.com/v3/smtp/email';
+      headers = { 'api-key': NOTIFY.apiKey, 'content-type': 'application/json', accept: 'application/json' };
+      body = JSON.stringify({
+        sender: { email: NOTIFY.from, name: 'N&B Solutions website' },
+        to: recipients.map((email) => ({ email })),
+        subject,
+        textContent: text,
+      });
+    } else if (NOTIFY.provider === 'resend') {
+      url = 'https://api.resend.com/emails';
+      headers = { authorization: `Bearer ${NOTIFY.apiKey}`, 'content-type': 'application/json' };
+      body = JSON.stringify({ from: NOTIFY.from, to: recipients, subject, text });
+    } else {
+      console.log(`[notify] unknown provider "${NOTIFY.provider}" — expected brevo or resend`);
+      return;
+    }
+
+    const res = await fetch(url, { method: 'POST', headers, body });
+    if (res.ok) {
+      console.log(`[notify] emailed ${recipients.join(', ')} about ${record.ref}`);
+    } else {
+      const detail = await res.text().catch(() => '');
+      console.log(`[notify] FAILED (${res.status}) for ${record.ref}: ${detail.slice(0, 300)}`);
+    }
+  } catch (err) {
+    console.log(`[notify] ERROR for ${record.ref}: ${err.message}`);
+  }
 }
 
 /* -------------------------------- helpers --------------------------------- */
@@ -202,6 +314,9 @@ async function handleApi(req, res, url) {
     const list = readBookings();
     list.unshift(record);
     writeBookings(list);
+    // Deliberately not awaited: the visitor's confirmation must not wait on
+    // email delivery, and a mail failure must not fail their enquiry.
+    notifyByEmail(record);
     console.log(
       `[enquiry] ${record.ref} — ${record.name} — ${record.service}` +
         (record.pickupDate ? ` — prefers ${record.pickupDate} ${record.slot || ''}` : ' — no date given')
@@ -216,8 +331,18 @@ async function handleApi(req, res, url) {
     }
     const list = readBookings();
     const status = url.searchParams.get('status');
-    const filtered = status && status !== 'all' ? list.filter((b) => b.status === status) : list;
-    return send(res, 200, { ok: true, count: filtered.length, bookings: filtered });
+    const archived = url.searchParams.get('archived');
+    let filtered = status && status !== 'all' ? list.filter((b) => b.status === status) : list;
+    // Archiving means "hidden", so the default view leaves them out.
+    // ?archived=true shows only archived ones; ?archived=all shows everything.
+    if (archived === 'true') filtered = filtered.filter((b) => b.archived);
+    else if (archived !== 'all') filtered = filtered.filter((b) => !b.archived);
+    return send(res, 200, {
+      ok: true,
+      count: filtered.length,
+      archived: list.filter((b) => b.archived).length,
+      bookings: filtered,
+    });
   }
 
   // POST /api/bookings/:ref/status  { key, status }
@@ -239,6 +364,47 @@ async function handleApi(req, res, url) {
     record.updatedAt = new Date().toISOString();
     writeBookings(list);
     return send(res, 200, { ok: true, booking: record });
+  }
+
+  // POST /api/bookings/:ref/archive  { key, archived } — hides a job, keeps it
+  if (parts[0] === 'bookings' && parts[2] === 'archive' && method === 'POST') {
+    let body;
+    try {
+      body = await readBody(req);
+    } catch (err) {
+      return send(res, 400, { ok: false, error: err.message });
+    }
+    if (body.key !== ADMIN_KEY) return send(res, 401, { ok: false, error: 'Invalid admin key.' });
+    const list = readBookings();
+    const record = list.find((b) => b.ref === parts[1]);
+    if (!record) return send(res, 404, { ok: false, error: 'Booking not found.' });
+    const archived = body.archived !== false;      // defaults to archiving
+    record.archived = archived;
+    record.archivedAt = archived ? new Date().toISOString() : null;
+    record.updatedAt = new Date().toISOString();
+    writeBookings(list);
+    console.log(`[archive] ${record.ref} — ${archived ? 'archived' : 'restored to the main list'}`);
+    return send(res, 200, { ok: true, booking: record });
+  }
+
+  // DELETE /api/bookings/:ref  { key } — permanent, but a recovery copy goes first
+  if (parts[0] === 'bookings' && parts.length === 2 && method === 'DELETE') {
+    let body = {};
+    try {
+      body = await readBody(req);
+    } catch (err) {
+      body = {};                                   // a body is optional here
+    }
+    const key = body.key || url.searchParams.get('key');
+    if (key !== ADMIN_KEY) return send(res, 401, { ok: false, error: 'Invalid admin key.' });
+    const list = readBookings();
+    const record = list.find((b) => b.ref === parts[1]);
+    if (!record) return send(res, 404, { ok: false, error: 'Booking not found.' });
+    appendDeleted(record);                         // safety copy, written first
+    const remaining = list.filter((b) => b.ref !== parts[1]);
+    writeBookings(remaining);
+    console.log(`[delete] ${record.ref} — ${record.name} — removed, recovery copy kept`);
+    return send(res, 200, { ok: true, ref: record.ref, deleted: true, remaining: remaining.length });
   }
 
   return send(res, 404, { ok: false, error: 'Unknown API route.' });
